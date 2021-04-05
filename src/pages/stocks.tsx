@@ -1,0 +1,185 @@
+import Head from "next/head"
+import Link from "next/link"
+import React, { ChangeEventHandler, MouseEventHandler, useState } from "react"
+import { Button, Card, Col, Container, Form, Table } from "react-bootstrap"
+import VisibilitySensor from "react-visibility-sensor"
+import Header from "../components/Header"
+import { TickerPrice } from "../components/Price"
+import { SelectList } from "../components/SelectList"
+import { stocksProdiver } from "../components/Stock/StockProvider"
+import { StocksProviderInterface } from "../types/StockType"
+import { defaultGetServerSideProps } from "../utils"
+import { getValueFromInput } from "../utils/defaultTypePath"
+import { HOSTNAME } from '../utils/env'
+
+export const getServerSideProps = defaultGetServerSideProps
+
+function Page() {
+    return <>
+        <Head>
+            <title>Stocks</title>
+        </Head>
+        <Header />
+        <Body />
+    </>
+}
+
+function Body() {
+    return <Container fluid>
+        <div className="d-flex flex-row justify-content-between align-items-center">
+            <h1>Stocks</h1>
+        </div>
+        <Stocks />
+    </Container>
+}
+
+interface StocksCtrlInterface {
+    search: string
+    onChange: ChangeEventHandler<HTMLInputElement>
+    onUpdateDb: MouseEventHandler<HTMLButtonElement>
+    is_updating: boolean
+}
+
+function StocksCtrl<TProps extends {}>(Component: React.ComponentType<TProps & StocksCtrlInterface>): React.FC<TProps> {
+    return (props) => {
+        const [search, setSeach] = useState('')
+        const [is_updating, setUpdating] = useState(false)
+        const handleChange: ChangeEventHandler<HTMLInputElement> = ({ target }) => {
+            const value = getValueFromInput(target)
+            setSeach(value)
+        }
+        async function handleUpdateDb() {
+            setUpdating(true)
+            await fetch(`http://${HOSTNAME}:3001/ticker/updatedb`)
+            // mutate(props.source_url)
+            setUpdating(false)
+        }
+        return <Component
+            {...props}
+            search={search}
+            onChange={handleChange}
+            onUpdateDb={handleUpdateDb}
+            is_updating={is_updating} />
+    }
+}
+
+function StocksView({ search, onChange, is_updating, onUpdateDb }: StocksCtrlInterface) {
+    return <>
+        <Form.Group>
+            <Form.Row>
+                <Col>
+                    <Form.Control
+                        placeholder="Type text to search stocks..."
+                        value={search}
+                        onChange={onChange} />
+                </Col>
+                <Col xs="auto">
+                    <Button
+                        variant="dark"
+                        disabled={is_updating}
+                        onClick={onUpdateDb}>{is_updating ? "Updating..." : "Update DB"}</Button>
+                </Col>
+            </Form.Row>
+        </Form.Group>
+
+        <StocksTable search={search} />
+    </>
+}
+
+const Stocks = StocksCtrl(StocksView)
+
+interface StocksTableCtrlInterface {
+    onAddTo(figi: string): void
+}
+
+function StocksTableCtrl<TProps extends {}>(Component: React.ComponentType<TProps & StocksTableCtrlInterface>): React.FC<TProps> {
+    return (props) => {
+        const [figi, setFigi] = useState('')
+        function handleAddTo(figi: string) {
+            setFigi(figi)
+        }
+
+        function handleClose() {
+            setFigi('')
+        }
+
+        return <>
+            <Component
+                {...props}
+                onAddTo={handleAddTo} />
+            <SelectList
+                figi={figi}
+                show={!!figi}
+                onClose={handleClose} />
+        </>
+    }
+}
+function StocksTableView({ instruments, onAddTo }: StocksProviderInterface & StocksTableCtrlInterface) {
+    const offset = {
+        top: -1000,
+        bottom: -1000
+    }
+    return <Card>
+        <Table
+            className="card-table"
+            responsive
+            hover
+            size="sm"
+            style={{ 'position': 'relative' }}>
+            <thead
+                style={{ 'position': 'sticky', 'top': 0 }}>
+                <tr>
+                    <th></th>
+                    <th>Ticker</th>
+                    <th className="text-right">Price</th>
+                    <th>Name</th>
+                    <th>Step</th>
+                    <th>Lot</th>
+                    <th>Currency</th>
+                    <th>Type</th>
+                    <th>FIGI</th>
+                </tr>
+            </thead>
+            <tbody>
+                {
+                    instruments.map((instrument, index) =>
+                        <tr key={instrument.figi}>
+                            <td>
+                                <Button
+                                    variant="outline-light"
+                                    className="text-nowrap"
+                                    size="sm"
+                                    onClick={() => onAddTo(instrument.figi)}>Lists</Button>
+                            </td>
+                            <th>
+                                <Link href={`/ticker/${instrument.ticker}`}>
+                                    <a>{instrument.ticker}</a>
+                                </Link>
+                            </th>
+                            <VisibilitySensor
+                                partialVisibility
+                                intervalCheck
+                                offset={offset}
+                            >
+                                {({ isVisible }) =>
+                                    <td className="text-right">
+                                        {isVisible && <TickerPrice figi={instrument.figi} placeholder={0} />}
+                                    </td>
+                                }
+                            </VisibilitySensor>
+                            <td>{instrument.name}</td>
+                            <td>{instrument.minPriceIncrement}</td>
+                            <td>{instrument.lot}</td>
+                            <td>{instrument.currency}</td>
+                            <td>{instrument.type}</td>
+                            <td>{instrument.figi}</td>
+                        </tr>
+                    )
+                }
+            </tbody>
+        </Table >
+    </Card>
+}
+const StocksTable = stocksProdiver(StocksTableCtrl(StocksTableView))
+
+export default Page

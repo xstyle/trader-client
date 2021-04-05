@@ -1,0 +1,7 @@
+node_modules
+.next
+build
+.env.*
+package-lock.json
+gulpfile*
+.DS_Store

@@ -1,0 +1,21 @@
+.thead-sticky {
+    position: sticky;
+    top: 0;
+}
+.tfoot-sticky {
+    position: sticky;
+    bottom: 0;
+}
+.table {
+    position: relative;
+    max-width: 100%;
+    overflow-x: scroll;
+}
+
+.card-table {
+    margin-bottom: 0;
+}
+.navbar {
+    margin-bottom: 20px;
+}
+  
