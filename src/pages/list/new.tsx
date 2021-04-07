@@ -6,6 +6,9 @@ import Header from "../../components/Header"
 import { NewListType } from "../../types/ListType"
 import { applyChangeToData, getValueFromInput } from "../../utils/defaultTypePath"
 import { HOSTNAME } from "../../utils/env"
+import { defaultGetServerSideProps } from "../../utils"
+
+export const getServerSideProps = defaultGetServerSideProps
 
 export default function Page() {
     return <>

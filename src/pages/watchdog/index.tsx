@@ -8,6 +8,9 @@ import { TickerPrice } from "../../components/Price";
 import { TickerInfo } from "../../components/Ticker";
 import { WatchDogCtrl, WatchdogCtrlInterface, watchdogsProvider } from "../../components/WatchDog/WatchDogProvider";
 import { WatchdogProviderInterface, WatchdogsProviderInterface } from "../../types/WatchdogType";
+import { defaultGetServerSideProps } from "../../utils"
+
+export const getServerSideProps = defaultGetServerSideProps
 
 export default function Page() {
     return <>

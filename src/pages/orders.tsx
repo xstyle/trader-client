@@ -1,12 +1,15 @@
-import { Button, Container, Table } from "react-bootstrap"
-import Header from "../components/Header"
 import Head from "next/head"
+import Link from "next/link"
+import { Button, Container, Table } from "react-bootstrap"
 import useSWR from "swr"
+import { defaultGetServerSideProps } from "../utils"
+import Header from "../components/Header"
 import { TickerPrice, TickerPriceWithCurrency } from "../components/Price"
 import { TickerInfo } from "../components/Ticker"
-
 import { HOSTNAME } from "../utils/env"
-import Link from "next/link"
+
+
+export const getServerSideProps = defaultGetServerSideProps
 
 export default function Page() {
     return <>

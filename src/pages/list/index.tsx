@@ -5,6 +5,9 @@ import { Button, Card, Container, Table } from "react-bootstrap"
 import Header from "../../components/Header"
 import { listsProvider } from "../../components/List/ListProvider"
 import { ListsProviderInterface } from "../../types/ListType"
+import { defaultGetServerSideProps } from "../../utils"
+
+export const getServerSideProps = defaultGetServerSideProps
 
 function Page() {
     return <>

@@ -1,1 +1,5 @@
-export const HOSTNAME = process.env.NEXT_PUBLIC_HOSTNAME
+import getConfig from 'next/config'
+
+const { publicRuntimeConfig } = getConfig()
+
+export const HOSTNAME = publicRuntimeConfig.HOSTNAME

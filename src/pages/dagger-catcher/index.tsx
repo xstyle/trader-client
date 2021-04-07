@@ -8,6 +8,9 @@ import Header from "../../components/Header"
 import { TinLink } from "../../components/Links"
 import { TickerInfo, tickerProvider, TickerProviderInterface } from "../../components/Ticker"
 import { DaggerCatchersProviderInterface } from "../../types/DaggerCatcherType"
+import { defaultGetServerSideProps } from "../../utils"
+
+export const getServerSideProps = defaultGetServerSideProps
 
 export default function Page() {
     return <>

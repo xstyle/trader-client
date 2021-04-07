@@ -11,4 +11,9 @@ const withTM = require("next-transpile-modules")([
     "@react-financial-charts/tooltip",
     "@react-financial-charts/utils"
 ]);
-module.exports = withTM();
+
+module.exports = withTM({
+    publicRuntimeConfig: {
+        HOSTNAME: process.env.HOSTNAME,
+    },
+});

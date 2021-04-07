@@ -6,6 +6,9 @@ import Moment from "react-moment";
 import { PageWithHeader } from "../../components/Header";
 import { historiesProvider, HistoriesProviderInterface } from "../../components/History/HistoryProvider";
 import { TickerInfo } from "../../components/Ticker";
+import { defaultGetServerSideProps } from "../../utils"
+
+export const getServerSideProps = defaultGetServerSideProps
 
 export default function Page() {
     return <PageWithHeader>

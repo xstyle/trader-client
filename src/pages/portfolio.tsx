@@ -3,6 +3,9 @@ import React from "react"
 import { Container } from "react-bootstrap"
 import Header from "../components/Header"
 import { Portfolio } from "../components/Portfolio"
+import { defaultGetServerSideProps } from "../utils"
+
+export const getServerSideProps = defaultGetServerSideProps
 
 export default function Page() {
     return <>

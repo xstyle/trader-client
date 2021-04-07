@@ -4,6 +4,9 @@ import React from "react"
 import { Container } from 'react-bootstrap'
 import Header from '../components/Header'
 import { OrdersCtrl, ordersProvider, OrdersView } from '../components/Orders'
+import { defaultGetServerSideProps } from "../utils"
+
+export const getServerSideProps = defaultGetServerSideProps
 
 function Page() {
     return <>

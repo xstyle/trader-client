@@ -1,6 +1,6 @@
 import '@fortawesome/fontawesome-free/css/all.css'
 import Head from 'next/head'
-// import 'bootstrap/dist/css/bootstrap.css'
+import App, { AppContext } from 'next/app'
 import '../styles/bootstrap.css'
 import '../styles/style.css'
 
@@ -13,4 +13,5 @@ function MyApp<TProps extends {}>({ Component, pageProps }: { Component: React.C
         <Component {...pageProps} />
     </>
 }
+
 export default MyApp
