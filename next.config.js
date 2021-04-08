@@ -15,5 +15,6 @@ const withTM = require("next-transpile-modules")([
 module.exports = withTM({
     publicRuntimeConfig: {
         HOSTNAME: process.env.HOSTNAME,
+        VERSION: process.env.VERSION || "DEV"
     },
 });

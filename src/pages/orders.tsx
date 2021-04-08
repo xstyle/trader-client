@@ -22,7 +22,7 @@ export default function Page() {
 }
 
 function Body() {
-    return <Container>
+    return <Container fluid>
         <h1>Active orders</h1>
         <Orders />
     </Container>

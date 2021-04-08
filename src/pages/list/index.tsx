@@ -1,6 +1,6 @@
 import Head from "next/head"
 import Link from "next/link"
-import React from "react"
+import React, { CSSProperties } from "react"
 import { Button, Card, Container, Table } from "react-bootstrap"
 import Header from "../../components/Header"
 import { listsProvider } from "../../components/List/ListProvider"
@@ -33,14 +33,18 @@ function Body() {
     </Container>
 }
 
+const style: CSSProperties = {
+    width: "1px"
+}
+
 function ListsView({ lists }: ListsProviderInterface) {
     return <Card>
-        <Table hover responsive size="sm">
+        <Table hover responsive>
             <thead className="thead-sticky">
                 <tr>
                     <th>Name</th>
                     <th>Tickers amount</th>
-                    <th></th>
+                    <th style={style}></th>
                 </tr>
             </thead>
             <tbody>
@@ -58,7 +62,7 @@ function ListsView({ lists }: ListsProviderInterface) {
                             <td>
                                 <Link href={`/list/${list._id}/edit`}>
                                     <Button
-                                        variant="dark"
+                                        variant={"secondary"}
                                         size="sm">edit</Button>
                                 </Link>
                             </td>

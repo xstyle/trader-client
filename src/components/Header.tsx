@@ -1,7 +1,8 @@
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
-import { Nav, Navbar } from 'react-bootstrap'
+import { Badge, Nav, Navbar } from 'react-bootstrap'
+import { VERSION } from '../utils/env'
 import { PortfolioAmount } from "./Portfolio"
 
 type Page = {
@@ -75,7 +76,7 @@ export default function Header() {
     return <Navbar bg="primary" variant="dark" expand="lg" >
         <Navbar.Toggle aria-controls="responsive-navbar-nav" />
         <Link href="/" passHref>
-            <Navbar.Brand>Robots</Navbar.Brand>
+            <Navbar.Brand>Robots <Badge variant="success">{VERSION}</Badge></Navbar.Brand>
         </Link>        
         <Navbar.Collapse id="responsive-navbar-nav">
             <Nav className="mr-auto">
