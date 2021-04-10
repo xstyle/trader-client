@@ -32,10 +32,10 @@ function Body() {
     if (Array.isArray(query.id)) return null
     return <Container fluid>
         <Row>
-            <Col lg={2} className="d-none d-lg-block">
+            <Col xl={2} lg={3} md={4} className="d-none d-lg-block">
                 <SideBar id={query.id} />
             </Col>
-            <Col lg={10}>
+            <Col xl={10} lg={9} md={8}>
                 <RobotPageBreadcrumb id={query.id} />
                 <div className="d-flex flex-row justify-content-between align-items-center">
                     <h1>Robot</h1>

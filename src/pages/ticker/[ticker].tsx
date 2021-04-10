@@ -62,7 +62,7 @@ function TickerInfoView({ ticker, onImportAllOrder, is_importing }: TickerCtrlIn
   return <Container fluid>
     <h1>{ticker.name}</h1>
     <Row>
-      <Col lg={2} xs={12} className="mb-3">
+      <Col xl={3} lg={4} md={5} className="mb-3">
         <p className="text-monospace display-3 text-center">
           <ColorPriceView ticker={state} />
         </p>
@@ -104,7 +104,7 @@ function TickerInfoView({ ticker, onImportAllOrder, is_importing }: TickerCtrlIn
         </div>
         <Statistica figi={ticker.figi} status={["Done", "New"]} />
       </Col>
-      <Col lg={10} xs={12}>
+      <Col xl={9} lg={8} md={7} >
         <Card>
           <Card.Body>
             <Chart
@@ -118,7 +118,6 @@ function TickerInfoView({ ticker, onImportAllOrder, is_importing }: TickerCtrlIn
     </Row>
     <h2>Orders</h2>
     <OrdersCollection figi={ticker.figi} status={["Done", "New"]} />
-    <TickerOperationHistory figi={ticker.figi} />
   </Container>
 }
 

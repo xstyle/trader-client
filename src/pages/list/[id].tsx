@@ -28,10 +28,10 @@ function Body() {
     if (!id) return null
     return <Container fluid>
         <Row>
-            <Col lg={3} className="d-none d-lg-block">
+            <Col xl={2} lg={3} md={4} className="d-none d-md-block">
                 <ListsNav id={id as string} />
             </Col>
-            <Col>
+            <Col xl={10} lg={9} md={8} >
                 <Breadcrumb>
                     <Link href="/list" passHref>
                         <Breadcrumb.Item>Lists</Breadcrumb.Item>

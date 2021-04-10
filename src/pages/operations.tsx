@@ -12,6 +12,7 @@ import { defaultGetServerSideProps } from "../utils"
 import { OperationType, OperationTypeWithCommission } from "@tinkoff/invest-openapi-js-sdk/build/domain.d"
 import "react-datepicker/dist/react-datepicker.css"
 import Head from "next/head"
+
 export const getServerSideProps = defaultGetServerSideProps
 
 export default function Page() {
@@ -179,9 +180,7 @@ function OperationsView(props: OperationsProviderInterface & OperationsSourceUrl
                 passHref
                 href={{
                     pathname: "/operations",
-                    query: {
-                        figi
-                    }
+                    query: {}
                 }}>
                 <Badge
                     variant="primary"

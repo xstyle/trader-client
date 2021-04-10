@@ -34,10 +34,10 @@ function Body() {
     if (Array.isArray(id)) return null
     return <Container fluid>
         <Row>
-            <Col lg={2} md={3} className="d-none d-md-block">
+            <Col xl="2" lg={3} md={4} className="d-none d-md-block">
                 <SideBar id={id} />
             </Col>
-            <Col lg={10} md={9} >
+            <Col xl="10" lg={9} md={8} >
                 <DaggerCatcher id={id} />
             </Col>
         </Row>

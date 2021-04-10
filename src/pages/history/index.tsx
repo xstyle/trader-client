@@ -55,7 +55,13 @@ function HistoriesView({ histories }: HistoriesProviderInterface) {
                                 </Link>
                             </td>
                             <td>
-                                <TickerInfo figi={history.figi} fieldName="ticker" />
+                                <Link
+                                    href={`/ticker/${history.figi}`}
+                                    passHref>
+                                    <a>
+                                        <TickerInfo figi={history.figi} fieldName="ticker" />
+                                    </a>
+                                </Link>
                             </td>
                             <td>{history.type || '-'}</td>
                             <td className="text-nowrap">
