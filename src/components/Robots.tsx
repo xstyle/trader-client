@@ -1,9 +1,9 @@
 import useSWR, { mutate } from "swr"
 import Link from "next/link"
-import useTicker from "./Ticker"
+import useTicker, { TickerInfo } from "./Ticker"
 import { HOSTNAME } from "../utils/env"
-import { Button, Card, Form, Table, ToastProps } from "react-bootstrap"
-import Price from "./Price"
+import { Badge, Button, Card, Form, Table, ToastProps } from "react-bootstrap"
+import Price, { TickerPrice } from "./Price"
 import { Component, CSSProperties } from "react"
 import { useRouter } from "next/router"
 import { RobotProviderInterface, RobotsProviderInterface, RobotsSourceUrlProviderInterface, RobotType } from "../types/RobotType"
@@ -21,7 +21,7 @@ function round(value: number) {
     return Math.round(value * 100) / 100
 }
 
-const Robots = robotsProvider(RobotsTable)
+const Robots = robotsProvider(RobotsList)
 
 const top_style: CSSProperties = {
     position: 'sticky',
@@ -31,6 +31,42 @@ const top_style: CSSProperties = {
 const footer_style: CSSProperties = {
     position: 'sticky',
     bottom: 0
+}
+
+function RobotsList(props: RobotsProviderInterface & RobotsSourceUrlProviderInterface) {
+    const robotsGroups = Object.values(props.robots.reduce<{ [id: string]: RobotType[] }>((index, robot) => {
+        if (!index[robot.figi]) index[robot.figi] = []
+        index[robot.figi].push(robot)
+        return index
+    }, {}))
+    return <>
+        {
+            robotsGroups.map((robotsGroup) => <RobotsGroupView
+                {...props}
+                robots={robotsGroup}
+                key={robotsGroup[0].figi}
+                figi={robotsGroup[0].figi} />)
+        }
+    </>
+}
+const style: CSSProperties = {
+    position: "sticky",
+    top: 0,
+    zIndex: 1,
+    backgroundColor: "#222"
+}
+function RobotsGroupView(props: RobotsProviderInterface & RobotsSourceUrlProviderInterface & {figi: string}) {
+    return <div>
+        <h3 style={style}>
+            <Link href={`/ticker/${props.figi}`}>
+                <a className="mr-4">
+                    <TickerInfo figi={props.figi} fieldName={"name"} />
+                </a>
+            </Link>
+            <Badge variant="success"><TickerPrice figi={props.figi}/></Badge>
+        </h3>
+        <RobotsTableView {...props} />
+    </div>
 }
 
 function RobotFooter(props: RobotsProviderInterface & RobotsSourceUrlProviderInterface & { figi: string }) {
@@ -44,7 +80,6 @@ function RobotFooter(props: RobotsProviderInterface & RobotsSourceUrlProviderInt
 
     return <tfoot style={footer_style}>
         <tr>
-            <th></th>
             <th></th>
             <th className="text-right">{round(consolidate_shares_number)}</th>
             <th></th>
@@ -60,7 +95,12 @@ function RobotFooter(props: RobotsProviderInterface & RobotsSourceUrlProviderInt
         </tr>
     </tfoot>
 }
-function RobotsTable(props: RobotsProviderInterface & RobotsSourceUrlProviderInterface) {
+
+const WIDTH_1PX_STYLE: CSSProperties = {
+    width: "1px"
+}
+
+function RobotsTableView(props: RobotsProviderInterface & RobotsSourceUrlProviderInterface) {
     return <Card>
         <Table
             responsive
@@ -70,20 +110,19 @@ function RobotsTable(props: RobotsProviderInterface & RobotsSourceUrlProviderInt
             <thead
                 style={top_style}>
                 <tr>
-                    <th></th>
-                    <th>Ticker</th>
-                    <th className="text-right" >Am.</th>
-                    <th>Price</th>
+                    <th style={WIDTH_1PX_STYLE}></th>
+                    <th className="text-right" >Amount</th>
+                    <th className="text-right">Price</th>
                     <th className="text-right">Buy</th>
                     <th className="text-right">Sell</th>
                     <th></th>
                     <th></th>
-                    <th>Budget</th>
+                    <th className="text-right">Budget</th>
                     <th></th>
-                    <th>Interest</th>
+                    <th className="text-right">Interest</th>
                     {/* <th>Orders</th> */}
                     <th>Tags</th>
-                    <th></th>
+                    <th style={WIDTH_1PX_STYLE}></th>
                 </tr>
             </thead>
             <tbody>
@@ -156,17 +195,6 @@ function RobotView({ robot, onEnable, onDisable }: RobotCtrlInterface & RobotPro
                     variant="outline-light">Show</Button>
             </Link>
         </td>
-        <th>
-            <div className="text-nowrap d-flex flex-row justify-content-between">
-                <Link href={`/ticker/${robot.ticker}`}>
-                    <a href={`/ticker/${robot.ticker}`}>{robot.ticker}</a>
-                </Link>
-
-            </div>
-            <div className="text-muted small text-monospace">
-                <Price price={robot.buy_price} />
-            </div>
-        </th>
         <td className="text-right text-monospace">
             <span className={robot.shares_number == 0 ? "text-muted" : ""}>{robot.shares_number}</span>
             <div className="text-muted small">
@@ -238,7 +266,7 @@ function RobotView({ robot, onEnable, onDisable }: RobotCtrlInterface & RobotPro
                 passHref>
                 <Button
                     size="sm"
-                    variant="outline-success">Edit</Button>
+                    variant={"secondary"}>Edit</Button>
             </Link>
         </td>
     </tr>
