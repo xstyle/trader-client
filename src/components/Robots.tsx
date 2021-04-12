@@ -55,17 +55,23 @@ const style: CSSProperties = {
     zIndex: 1,
     backgroundColor: "#222"
 }
-function RobotsGroupView(props: RobotsProviderInterface & RobotsSourceUrlProviderInterface & {figi: string}) {
-    return <div>
-        <h3 style={style}>
-            <Link href={`/ticker/${props.figi}`}>
-                <a className="mr-4">
-                    <TickerInfo figi={props.figi} fieldName={"name"} />
-                </a>
-            </Link>
-            <Badge variant="success"><TickerPrice figi={props.figi}/></Badge>
-        </h3>
+function RobotsGroupView(props: RobotsProviderInterface & RobotsSourceUrlProviderInterface & { figi: string }) {
+    return <div className="">
+        <div style={style}  className="pb-2">
+            <h4 className="mb-0">
+                <Link href={`/ticker/${props.figi}`}>
+                    <a className="text-body">
+                        <TickerInfo figi={props.figi} fieldName={"name"} />
+                    </a>
+                </Link>
+            </h4>
+            <Badge variant="info"><TickerPrice figi={props.figi} /></Badge>
+            {/* <TickerPrice figi={props.figi} /> */}
+            
+        </div>
+
         <RobotsTableView {...props} />
+        <hr></hr>
     </div>
 }
 
@@ -101,18 +107,19 @@ const WIDTH_1PX_STYLE: CSSProperties = {
 }
 
 function RobotsTableView(props: RobotsProviderInterface & RobotsSourceUrlProviderInterface) {
-    return <Card>
+    return <>
         <Table
             responsive
             hover
             size="sm"
+            className="mb-0"
         >
             <thead
                 style={top_style}>
                 <tr>
                     <th style={WIDTH_1PX_STYLE}></th>
                     <th className="text-right" >Amount</th>
-                    <th className="text-right">Price</th>
+                    {/* <th className="text-right">Price</th> */}
                     <th className="text-right">Buy</th>
                     <th className="text-right">Sell</th>
                     <th></th>
@@ -135,9 +142,9 @@ function RobotsTableView(props: RobotsProviderInterface & RobotsSourceUrlProvide
                     )
                 }
             </tbody>
-            {typeof props.figi != 'undefined' ? <RobotFooter {...props} figi={props.figi} /> : null}
+            {/* {typeof props.figi != 'undefined' ? <RobotFooter {...props} figi={props.figi} /> : null} */}
         </Table >
-    </Card>
+    </>
 }
 
 const Robot = RobotCtrl(RobotView)
@@ -152,7 +159,7 @@ export interface RobotCtrlInterface {
 
 export function RobotCtrl<TProps extends RobotProviderInterface>(Component: React.ComponentType<TProps & RobotCtrlInterface>): React.FC<TProps> {
     return (props) => {
-        const { source_url, robot: robot } = props
+        const { source_url, robot } = props
         async function handleEnable() {
             await fetch(`http://${HOSTNAME}:3001/robot/${robot._id}/enable`)
             mutate(source_url)
@@ -192,29 +199,29 @@ function RobotView({ robot, onEnable, onDisable }: RobotCtrlInterface & RobotPro
                 passHref>
                 <Button
                     size="sm"
-                    variant="outline-light">Show</Button>
+                    variant="secondary"><i className="fa fa-info"/></Button>
             </Link>
         </td>
         <td className="text-right text-monospace">
-            <span className={robot.shares_number == 0 ? "text-muted" : ""}>{robot.shares_number}</span>
+            <span>{robot.shares_number}</span>
             <div className="text-muted small">
                 [{robot.min_shares_number}...{robot.max_shares_number}]
             </div>
         </td>
-        <td className="text-right text-monospace">
+        {/* <td className="text-right text-monospace">
             {ticker && <Pricemetr
                 price={ticker.c}
                 {...robot} />}
-        </td>
+        </td> */}
         <td className="text-right text-monospace">
             <div><Price price={robot.buy_price} /></div>
-            <div className="small">
+            <div className="small text-muted">
                 {robot.price_for_placing_buy_order === robot.buy_price ? '~' : <Price price={robot.price_for_placing_buy_order} />}
             </div>
         </td>
         <td className="text-right text-monospace">
             <div><Price price={robot.sell_price} /></div>
-            <div className="small">
+            <div className="small text-muted">
                 {robot.price_for_placing_sell_order === robot.sell_price ? '~' : <Price price={robot.price_for_placing_sell_order} />}
             </div>
         </td>
@@ -266,7 +273,7 @@ function RobotView({ robot, onEnable, onDisable }: RobotCtrlInterface & RobotPro
                 passHref>
                 <Button
                     size="sm"
-                    variant={"secondary"}>Edit</Button>
+                    variant={"secondary"}><i className="fa fa-edit"/></Button>
             </Link>
         </td>
     </tr>
