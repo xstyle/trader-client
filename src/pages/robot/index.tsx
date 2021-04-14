@@ -27,14 +27,15 @@ export default function Instruments() {
 const Sidebar = robotsProvider(SidebarCtrl(SidebarView))
 
 function Body() {
-    const { query } = useRouter()
+    const { query: { figi, tag } } = useRouter()
+    const id = Array.isArray(figi) || !figi ? undefined : figi
     return <Container fluid>
         <Row>
             <Col lg="2">
-                <Sidebar id={query.figi as string} />
+                <Sidebar id={id} />
             </Col>
             <Col lg="10">
-                <Main query={query} />
+                <MainView query={{ figi, tag }} />
             </Col>
         </Row>
     </Container>
@@ -44,7 +45,7 @@ interface SidebarCtrlInterface {
     items: { figi: string }[]
 }
 
-function SidebarCtrl<TProps extends { id: string }>(Component: React.ComponentType<TProps & SidebarCtrlInterface>): React.FC<TProps & RobotsProviderInterface & RobotsSourceUrlProviderInterface> {
+function SidebarCtrl<TProps extends {}>(Component: React.ComponentType<TProps & SidebarCtrlInterface>): React.FC<TProps & RobotsProviderInterface & RobotsSourceUrlProviderInterface> {
     return (props) => {
         const index = props.robots.reduce((index, { figi }) => {
             if (!index[figi]) index[figi] = { figi }
@@ -57,7 +58,7 @@ function SidebarCtrl<TProps extends { id: string }>(Component: React.ComponentTy
     }
 }
 
-function SidebarView({ id, items = [] }: { id: string } & SidebarCtrlInterface) {
+function SidebarView({ id, items = [] }: { id: string | undefined } & SidebarCtrlInterface) {
     return <Nav
         variant="pills"
         style={{ position: 'sticky', top: '1rem' }}
@@ -89,7 +90,11 @@ function SidebarView({ id, items = [] }: { id: string } & SidebarCtrlInterface) 
     </Nav>
 }
 
-function Main({ query }: { query: { tag?: string, figi?: string } }) {
+function MainView({ query }: { query: { tag?: string | string[], figi?: string | string[] } }) {
+    const { figi, tag } = query
+    const figis: string[] = !figi ? [] : Array.isArray(figi) ? figi : [figi]
+    const tags: string[] = !tag ? [] : Array.isArray(tag) ? tag : [tag]
+
     return <>
         <div className="d-flex flex-row justify-content-between align-items-center">
             <h1>Robots</h1>
@@ -98,27 +103,31 @@ function Main({ query }: { query: { tag?: string, figi?: string } }) {
 
         {(query.tag || query.figi) &&
             <Form.Group>
-                {query.tag &&
-                    <Link href={{
-                        pathname: '/robot',
-                        query: {
-                            ...query,
-                            tag: undefined
-                        }
-                    }}>
-                        <a className="badge badge-primary">{query.tag} <span aria-hidden="true">&times;</span></a>
-                    </Link>
+                {
+                    tags.map(tag => (
+                        <Link href={{
+                            pathname: '/robot',
+                            query: {
+                                ...query,
+                                tag: undefined
+                            }
+                        }}>
+                            <a className="badge badge-primary">{tag} <span aria-hidden="true">&times;</span></a>
+                        </Link>
+                    ))
                 }
-                {query.figi &&
-                    <Link href={{
-                        pathname: '/robot',
-                        query: {
-                            ...query,
-                            figi: undefined
-                        }
-                    }}>
-                        <a className="badge badge-primary"><TickerInfo figi={query.figi} fieldName="name" /> <span aria-hidden="true">&times;</span></a>
-                    </Link>
+                {
+                    figis.map(figi => (
+                        <Link href={{
+                            pathname: '/robot',
+                            query: {
+                                ...query,
+                                figi: undefined
+                            }
+                        }}>
+                            <a className="badge badge-primary"><TickerInfo figi={figi} fieldName="name" /> <span aria-hidden="true">&times;</span></a>
+                        </Link>
+                    ))
                 }
             </Form.Group>
         }

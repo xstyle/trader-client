@@ -30,8 +30,8 @@ export type RobotType = NewRobotType & {
 }
 
 export interface RobotsSourceUrlProviderInterface {
-    tag?: string
-    figi?: string
+    tag?: string | string[]
+    figi?: string | string[]
 }
 
 export interface RobotsProviderInterface {

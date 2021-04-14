@@ -37,7 +37,8 @@ export function RobotsSourceUrlProvider(params: RobotsSourceUrlProviderInterface
     const { tag, figi } = params
     const url = new URL('/robot', `http://${HOSTNAME}:3001`)
 
-    tag && url.searchParams.set('tag', tag)
-    figi && url.searchParams.set('figi', figi)
+    tag && (Array.isArray(tag) ? tag : [tag]).map(_tag => url.searchParams.append('tag', _tag))
+    figi && (Array.isArray(figi) ? figi : [figi]).map(_figi => url.searchParams.append('figi', _figi))
+
     return url.href
 }
