@@ -4,7 +4,7 @@ import React, { ChangeEventHandler, MouseEventHandler, useState } from "react"
 import { Button, Card, Col, Container, Form, Table } from "react-bootstrap"
 import VisibilitySensor from "react-visibility-sensor"
 import Header from "../components/Header"
-import { TickerPrice } from "../components/Price"
+import { MarketInstrumentPrice } from "../components/Price"
 import { SelectList } from "../components/SelectList"
 import { stocksProdiver } from "../components/Stock/StockProvider"
 import { StocksProviderInterface } from "../types/StockType"
@@ -163,7 +163,7 @@ function StocksTableView({ instruments, onAddTo }: StocksProviderInterface & Sto
                             >
                                 {({ isVisible }) =>
                                     <td className="text-right">
-                                        {isVisible && <TickerPrice figi={instrument.figi} placeholder={0} />}
+                                        {isVisible && <MarketInstrumentPrice figi={instrument.figi} placeholder={0} />}
                                     </td>
                                 }
                             </VisibilitySensor>

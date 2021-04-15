@@ -6,7 +6,7 @@ import ReactDatePicker from "react-datepicker"
 import Moment from "react-moment"
 import Header from "../components/Header"
 import { operationsProvider } from "../components/Operation/OperationProvider"
-import { TickerInfo } from "../components/Ticker"
+import { MarketInstrumentField } from "../components/Candle"
 import { OperationsProviderInterface, OperationsSourceUrlProviderInterface, OperationStatus } from "../types/OperationType"
 import { defaultGetServerSideProps } from "../utils"
 import { OperationType, OperationTypeWithCommission } from "@tinkoff/invest-openapi-js-sdk/build/domain.d"
@@ -185,7 +185,7 @@ function OperationsView(props: OperationsProviderInterface & OperationsSourceUrl
                 <Badge
                     variant="primary"
                     as="a">
-                    <TickerInfo
+                    <MarketInstrumentField
                         figi={figi}
                         fieldName="name" /> <span aria-hidden="true">&times;</span>
                 </Badge>
@@ -234,7 +234,7 @@ function OperationTableView({ operations, figi, onSetEnd, onSetStart }: Operatio
                                         figi: item.figi
                                     }
                                 }}>
-                                <a><TickerInfo figi={item.figi} fieldName="ticker" /></a>
+                                <a><MarketInstrumentField figi={item.figi} fieldName="ticker" /></a>
                             </Link>}
                         </td>
                         <td>{item.status}</td>

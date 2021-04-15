@@ -8,15 +8,16 @@ import Chart from "../../components/Chart";
 import { daggerCatcherProvider, daggerCatchersProvider } from '../../components/DaggerCatcher/DaggerCatcherProvider';
 import Header from "../../components/Header";
 import { MutateOrders, OrdersCtrl, OrdersCtrlInterface, ordersProvider, OrdersProviderInterface, OrdersSourceUrlProviderOptions, OrdersTable } from "../../components/Orders";
-import Price, { ColorPriceView, TickerPrice } from "../../components/Price";
+import Price, { ColorPriceView, MarketInstrumentPrice } from "../../components/Price";
 import { Reports } from '../../components/Reports';
 import { useStatistica } from '../../components/Statistic/Statistic';
-import useTicker, { TickerInfo, useTickerInfo } from "../../components/Ticker";
+import useSuperCandle, { MarketInstrumentField, useMarketInstrument } from "../../components/Candle";
 import { DaggerCatcherProviderInterface, DaggerCatchersProviderInterface } from '../../types/DaggerCatcherType';
-import { TickerData, TickerInfoType } from "../../types/TickerType";
+import { SuperCandle } from "../../types/CandleType";
 import { OrderType } from "../../types/OrderType";
 import { defaultGetServerSideProps } from "../../utils";
 import { getValueFromInput } from "../../utils/defaultTypePath";
+import { MarketInstrument } from '@tinkoff/invest-openapi-js-sdk/build/domain.d';
 
 export const getServerSideProps = defaultGetServerSideProps
 
@@ -62,14 +63,14 @@ function SideBarView({ id, daggerCatchers }: DaggerCatchersProviderInterface & {
                     <Nav.Link
                         active={catcher.figi === id}
                         className="d-flex flex-row justify-content-between">
-                        <TickerInfo
+                        <MarketInstrumentField
                             figi={catcher.figi}
                             fieldName="ticker" />
                         <div>
                             <Badge
                                 pill
                                 variant="light">
-                                <TickerPrice figi={catcher.figi} />
+                                <MarketInstrumentPrice figi={catcher.figi} />
                             </Badge>
                         </div>
                     </Nav.Link>
@@ -99,11 +100,11 @@ function OrdersView(props: OrdersProviderInterface & OrdersCtrlInterface & Order
 }
 
 function Statistica({ orders, figi }: { figi: string, orders: OrderType[] }) {
-    const ticker = useTicker(figi)
+    const candle = useSuperCandle(figi)
     const { lots, budget, price_per_share } = useStatistica(orders)
-    if (!ticker) return <div>Loading ticker...</div>
+    if (!candle) return <div>Loading a candle...</div>
 
-    const cost = lots * ticker.c
+    const cost = lots * candle.c
     const result = budget + cost
     const profit = result / budget * 100
 
@@ -120,8 +121,8 @@ const Orders = ordersProvider(
 )
 
 interface DaggerCatcherCtrlInterface {
-    tickerInfo: TickerInfoType
-    ticker: TickerData
+    marketInstrument: MarketInstrument,
+    candle: SuperCandle,
     state: {
         price: number,
         min: number,
@@ -129,14 +130,14 @@ interface DaggerCatcherCtrlInterface {
         step: number,
         lots: number
     },
-    onChange: ChangeEventHandler<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>
-    onSubmit(operation: "Sell" | "Buy"): void
+    onChange: ChangeEventHandler<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>,
+    onSubmit(operation: "Sell" | "Buy"): void,
 }
 
 function DaggerCatcherCtrl<TProps extends DaggerCatcherProviderInterface>(Component: ComponentType<TProps & DaggerCatcherCtrlInterface>): FC<TProps> {
     return (props) => {
-        const ticker = useTicker(props.daggerCatcher.figi)
-        const { error, data: tickerInfo } = useTickerInfo(props.daggerCatcher.figi)
+        const candle = useSuperCandle(props.daggerCatcher.figi)
+        const { error, data: marketInstrument } = useMarketInstrument(props.daggerCatcher.figi)
 
         const initialState = {
             price: Math.round((props.daggerCatcher.max + props.daggerCatcher.min) * 100 / 2) / 100,
@@ -153,7 +154,7 @@ function DaggerCatcherCtrl<TProps extends DaggerCatcherProviderInterface>(Compon
         }, [props.daggerCatcher])
 
         if (error) return <div>Error</div>
-        if (!ticker || !tickerInfo) return <div>Loading...</div>
+        if (!candle || !marketInstrument) return <div>Loading...</div>
 
         const handleChange: ChangeEventHandler<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement> = (event) => {
             const { target } = event
@@ -185,29 +186,29 @@ function DaggerCatcherCtrl<TProps extends DaggerCatcherProviderInterface>(Compon
             state={state}
             onSubmit={handleSubmit}
             onChange={handleChange}
-            ticker={ticker}
-            tickerInfo={tickerInfo} />
+            candle={candle}
+            marketInstrument={marketInstrument} />
     }
 }
 
-function DaggerCatcherView({ daggerCatcher: catcher, tickerInfo, onSubmit, state, onChange, ticker }: DaggerCatcherProviderInterface & DaggerCatcherCtrlInterface) {
+function DaggerCatcherView({ daggerCatcher: catcher, marketInstrument, onSubmit, state, onChange, candle }: DaggerCatcherProviderInterface & DaggerCatcherCtrlInterface) {
     return <>
         <Head>
-            <title>${tickerInfo.ticker} {ticker.c.toFixed(2)}</title>
+            <title>${marketInstrument.ticker} {candle.c.toFixed(2)}</title>
         </Head>
         <Breadcrumb>
             <Link href="/dagger-catcher" passHref>
                 <Breadcrumb.Item>Dagger Catchers</Breadcrumb.Item>
             </Link>
-            <Breadcrumb.Item active>{tickerInfo.name}</Breadcrumb.Item>
+            <Breadcrumb.Item active>{marketInstrument.name}</Breadcrumb.Item>
         </Breadcrumb>
         <Row>
             <Col sm="12" md="6">
                 <p className="text-monospace display-3 text-center">
-                    <ColorPriceView ticker={ticker} />
+                    <ColorPriceView candle={candle} />
                 </p>
-                <p className="text-monospace text-center">{ticker.v.toFixed(0)} shares for <Moment durationFromNow interval={100}>{ticker.time}</Moment></p>
-                <p className="text-monospace text-center">{(ticker.v * 1000 / (Date.now() - new Date(ticker.time).getTime())).toFixed(0)} shares per second</p>
+                <p className="text-monospace text-center">{candle.v.toFixed(0)} shares for <Moment durationFromNow interval={100}>{candle.time}</Moment></p>
+                <p className="text-monospace text-center">{(candle.v * 1000 / (Date.now() - new Date(candle.time).getTime())).toFixed(0)} shares per second</p>
                 <Card className="mb-4">
                     <Card.Body>
                         <Form>

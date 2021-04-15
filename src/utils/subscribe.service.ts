@@ -1,4 +1,4 @@
-import { TickerData } from '../types/TickerType'
+import { Candle } from '@tinkoff/invest-openapi-js-sdk/build/domain.d'
 import { socket } from './io'
 
 export type Interval = "1min" | "1day"
@@ -6,8 +6,8 @@ interface Subscriber {
     figi: string,
     interval: Interval
 }
-type RootSubscriberCallback = (data: TickerData) => void
-type SubscriberCallback = (data: TickerData, last_data?: TickerData) => void
+type RootSubscriberCallback = (data: Candle) => void
+type SubscriberCallback = (data: Candle, last_data?: Candle) => void
 
 interface Subscribtion extends Subscriber {
     cb: SubscriberCallback
@@ -26,7 +26,7 @@ class SubscribeService {
     attempt_amount = 0
     subscribers: { [id: string]: { [id in Interval]?: SubscriberCallback[] } } = {}
     socket_subscriber: { [id: string]: { [id in Interval]?: RootSubscriberCallback } } = {}
-    old_values: { [id: string]: { [id in Interval]?: TickerData } } = {}
+    old_values: { [id: string]: { [id in Interval]?: Candle } } = {}
 
     resubscribe() {
         this.getAllRootSubscribers()
@@ -87,12 +87,12 @@ class SubscribeService {
         return rootSubscriberCallback
     }
 
-    setOldValue({ figi, interval, data }: { figi: string, interval: Interval, data: TickerData }): void {
+    setOldValue({ figi, interval, data }: { figi: string, interval: Interval, data: Candle }): void {
         if (!this.old_values[figi]) this.old_values[figi] = { [interval]: data }
         this.old_values[figi][interval] = data
     }
 
-    getOldValue({ figi, interval }: Subscriber): TickerData | undefined {
+    getOldValue({ figi, interval }: Subscriber): Candle | undefined {
         if (!this.old_values[figi]) return
         if (!this.old_values[figi][interval]) return
         return this.old_values[figi][interval]

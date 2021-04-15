@@ -1,17 +1,16 @@
 import Link from "next/link"
 import { useRouter } from "next/router"
-import { useState } from "react"
+import React, { useState } from "react"
 import { Button, Card, Col, Container, ListGroup, Row, Table } from "react-bootstrap"
-import useSWR from "swr"
 import Chart from "../../components/Chart"
 import { PageWithHeader } from "../../components/Header"
 import { InstrumentsLink, TinLink } from "../../components/Links"
+import { marketInstrumentProvider, MarketInstrumentProviderInterface } from "../../components/MarketInstrument/MarketInstrumentProvider"
 import { ordersProvider, OrdersProviderInterface, OrdersSourceUrlProviderOptions } from "../../components/Orders"
 import { OrdersCollection } from "../../components/OrdersCollection"
-import { ColorPriceView, TickerPrice, TickerPriceWithCurrency } from "../../components/Price"
+import { ColorPriceView, MarketInstrumentPrice, MarketInstrumentPriceWithCurrency } from "../../components/Price"
 import { useStatistica } from "../../components/Statistic/Statistic"
-import useTicker, { useStatefullTicker } from "../../components/Ticker"
-import { TickerInfoType } from "../../types/TickerType"
+import useSuperCandle, { useStatefullSuperCandleHistory } from "../../components/Candle"
 import { defaultGetServerSideProps } from "../../utils"
 import { HOSTNAME } from "../../utils/env"
 
@@ -25,24 +24,20 @@ export default Page
 
 function Body() {
   const router = useRouter()
-  const { ticker } = router.query
-  const { data, error } = useSWR<TickerInfoType>(`http://${HOSTNAME}:3001/ticker/${ticker}`)
-  if (error) return <div>Error</div>
-  if (!data) return <div>Loading...</div>
-  return <TickerInfo ticker={data} />
+  const figi = router.query.figi as string
+  return <MarketInstrumentInfo figi={figi} />
 }
 
-interface TickerCtrlInterface {
-  ticker: TickerInfoType,
+interface MarketInstrumentCtrlInterface {
   is_importing: boolean,
   onImportAllOrder: () => Promise<void>
 }
 
-const TickerCtrl = <TProps extends { ticker: TickerInfoType }>(Component: React.ComponentType<TProps & TickerCtrlInterface>): React.FC<TProps> => (props) => {
+const MarketInstrumentCtrl = <TProps extends MarketInstrumentProviderInterface>(Component: React.ComponentType<TProps & MarketInstrumentCtrlInterface>): React.FC<TProps> => (props) => {
   const [is_importing, setImportStatus] = useState<boolean>(false)
   async function handleImportAllOrders() {
     setImportStatus(true)
-    const response = await fetch(`http://${HOSTNAME}:3001/ticker/${props.ticker.figi}/import_orders`)
+    const response = await fetch(`http://${HOSTNAME}:3001/ticker/${props.marketInstrument.figi}/import_orders`)
     const data = await response.json()
     setImportStatus(false)
     console.log(data)
@@ -54,29 +49,29 @@ const TickerCtrl = <TProps extends { ticker: TickerInfoType }>(Component: React.
   />
 }
 
-const TickerInfo = TickerCtrl(TickerInfoView)
+const MarketInstrumentInfo = marketInstrumentProvider(MarketInstrumentCtrl(MarketInstrumentInfoView))
 
-function TickerInfoView({ ticker, onImportAllOrder, is_importing }: TickerCtrlInterface) {
-  const state = useTicker(ticker.figi)
-  if (!state) return <div>Waiting update of Ticker {ticker.ticker}...</div>
+function MarketInstrumentInfoView({ marketInstrument, onImportAllOrder, is_importing }: MarketInstrumentCtrlInterface & MarketInstrumentProviderInterface) {
+  const candle = useSuperCandle(marketInstrument.figi)
+  if (!candle) return <div>Waiting update of Ticker {marketInstrument.ticker}...</div>
   return <Container fluid>
-    <h1>{ticker.name}</h1>
+    <h1>{marketInstrument.name}</h1>
     <Row>
       <Col xl={3} lg={4} md={5} className="mb-3">
         <p className="text-monospace display-3 text-center">
-          <ColorPriceView ticker={state} />
+          <ColorPriceView candle={candle} />
         </p>
-        <p>Value {state.v}</p>
-        <p>Number {state.n}</p>
+        <p>Value {candle.v}</p>
+        <p>Number {candle.n}</p>
         <div className="form-group">
           <Link
             passHref
             href={{
               pathname: '/robot/new',
               query: {
-                figi: ticker.figi,
-                buy_price: state.c,
-                name: ticker.name
+                figi: marketInstrument.figi,
+                buy_price: candle.c,
+                name: marketInstrument.name
               }
             }}>
             <Button
@@ -88,27 +83,27 @@ function TickerInfoView({ ticker, onImportAllOrder, is_importing }: TickerCtrlIn
             variant={"secondary"}
             disabled={is_importing}
             onClick={onImportAllOrder}>{is_importing ? "Importing..." : "Import"}</Button>
-          <InstrumentsLink figi={ticker.figi}>
+          <InstrumentsLink figi={marketInstrument.figi}>
             <Button
               variant="secondary"
               className="mr-2 mb-2">Robots</Button>
           </InstrumentsLink>
           <Link
-            href={`/dagger-catcher/${ticker.figi}`}
+            href={`/dagger-catcher/${marketInstrument.figi}`}
             passHref>
             <Button
               variant="secondary"
               className="mr-2 mb-2">Dagger Catcher</Button>
           </Link>
-          <TinLink figi={ticker.figi} />
+          <TinLink figi={marketInstrument.figi} />
         </div>
-        <Statistica figi={ticker.figi} status={["Done", "New"]} />
+        <Statistica figi={marketInstrument.figi} status={["Done", "New"]} />
       </Col>
       <Col xl={9} lg={8} md={7} >
         <Card>
           <Card.Body>
             <Chart
-              figi={ticker.figi}
+              figi={marketInstrument.figi}
               interval="1min"
               dateTimeFormat="%H:%M" />
           </Card.Body>
@@ -117,12 +112,12 @@ function TickerInfoView({ ticker, onImportAllOrder, is_importing }: TickerCtrlIn
       </Col>
     </Row>
     <h2>Orders</h2>
-    <OrdersCollection figi={ticker.figi} status={["Done", "New"]} />
+    <OrdersCollection figi={marketInstrument.figi} status={["Done", "New"]} />
   </Container>
 }
 
-function TickerOperationHistory({ figi }: { figi: string }) {
-  const history = useStatefullTicker(figi)
+function OperationHistory({ figi }: { figi: string }) {
+  const history = useStatefullSuperCandleHistory(figi)
   return <Card>
     <Card.Header>
       Last transactions
@@ -162,8 +157,8 @@ const Statistica = ordersProvider((props: OrdersProviderInterface & OrdersSource
 
   return <ListGroup>
     <ListGroup.Item>Всего {statistics.lots}</ListGroup.Item>
-    {!!statistics.lots && <ListGroup.Item>Средняя <TickerPriceWithCurrency price={statistics.price_per_share} figi={props.figi} /></ListGroup.Item>}
-    <ListGroup.Item>Бюджет <TickerPriceWithCurrency price={statistics.budget} figi={props.figi} /></ListGroup.Item>
-    <ListGroup.Item>Доход <TickerPrice figi={props.figi} lots={statistics.lots} adjustment={statistics.budget} /></ListGroup.Item>
+    {!!statistics.lots && <ListGroup.Item>Средняя <MarketInstrumentPriceWithCurrency price={statistics.price_per_share} figi={props.figi} /></ListGroup.Item>}
+    <ListGroup.Item>Бюджет <MarketInstrumentPriceWithCurrency price={statistics.budget} figi={props.figi} /></ListGroup.Item>
+    <ListGroup.Item>Доход <MarketInstrumentPrice figi={props.figi} lots={statistics.lots} adjustment={statistics.budget} /></ListGroup.Item>
   </ListGroup>
 })

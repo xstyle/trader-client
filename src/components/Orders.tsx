@@ -7,9 +7,9 @@ import useSWR, { mutate } from "swr"
 import { OrderType } from "../types/OrderType"
 import { HOSTNAME } from '../utils/env'
 import { Paginator } from "../utils/pagination"
-import Price, { TickerPriceWithCurrency } from "./Price"
+import Price, { MarketInstrumentPriceWithCurrency } from "./Price"
 import { SelectOperation } from "./SelectOperation"
-import { TickerInfo } from "./Ticker"
+import { MarketInstrumentField } from "./Candle"
 
 const style: React.CSSProperties = {
     position: 'sticky',
@@ -47,18 +47,18 @@ export function OrdersView({ orders }: OrdersProviderInterface) {
                             </td>
                             <td>
                                 <Link href={`/ticker/${order.figi}`}>
-                                    <a><TickerInfo figi={order.figi} fieldName="ticker" /></a>
+                                    <a><MarketInstrumentField figi={order.figi} fieldName="ticker" /></a>
                                 </Link>
                             </td>
                             <td>{order.operation}</td>
                             <td className="text-right">{order.requestedLots}</td>
                             <td className="text-right">
-                                <TickerPriceWithCurrency price={order.price} figi={order.figi} />
+                                <MarketInstrumentPriceWithCurrency price={order.price} figi={order.figi} />
                             </td>
                             <td>{order.status}</td>
                             <td className="text-right">{order.executedLots || 0}</td>
-                            <td className="text-right"><TickerPriceWithCurrency price={order.payment} figi={order.figi} /></td>
-                            <td className="text-right"><TickerPriceWithCurrency price={order.requestedPrice} figi={order.figi} /></td>
+                            <td className="text-right"><MarketInstrumentPriceWithCurrency price={order.payment} figi={order.figi} /></td>
+                            <td className="text-right"><MarketInstrumentPriceWithCurrency price={order.requestedPrice} figi={order.figi} /></td>
                         </tr>
                     )
                 }

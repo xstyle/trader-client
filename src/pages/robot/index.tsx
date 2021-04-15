@@ -4,11 +4,11 @@ import { useRouter } from 'next/router'
 import React from 'react'
 import { Badge, Col, Container, Form, Nav, Row } from 'react-bootstrap'
 import Header from '../../components/Header'
-import { TickerPrice } from '../../components/Price'
+import { MarketInstrumentPrice } from '../../components/Price'
 import { robotsProvider } from '../../components/Robot/RobotProvider'
 import Robots from '../../components/Robots'
 import State from '../../components/State'
-import { TickerInfo } from '../../components/Ticker'
+import { MarketInstrumentField } from '../../components/Candle'
 import { RobotsProviderInterface, RobotsSourceUrlProviderInterface } from '../../types/RobotType'
 import { defaultGetServerSideProps } from '../../utils'
 
@@ -73,14 +73,14 @@ function SidebarView({ id, items = [] }: { id: string | undefined } & SidebarCtr
                     <Nav.Link
                         active={item.figi === id}
                         className="d-flex flex-row justify-content-between">
-                        <TickerInfo
+                        <MarketInstrumentField
                             figi={item.figi}
                             fieldName="ticker" />
                         <div>
                             <Badge
                                 pill
                                 variant="light">
-                                <TickerPrice figi={item.figi} placeholder={0} />
+                                <MarketInstrumentPrice figi={item.figi} placeholder={0} />
                             </Badge>
                         </div>
                     </Nav.Link>
@@ -125,7 +125,7 @@ function MainView({ query }: { query: { tag?: string | string[], figi?: string |
                                 figi: undefined
                             }
                         }}>
-                            <a className="badge badge-primary"><TickerInfo figi={figi} fieldName="name" /> <span aria-hidden="true">&times;</span></a>
+                            <a className="badge badge-primary"><MarketInstrumentField figi={figi} fieldName="name" /> <span aria-hidden="true">&times;</span></a>
                         </Link>
                     ))
                 }

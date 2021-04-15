@@ -4,9 +4,9 @@ import { useRouter } from "next/router"
 import { ChangeEventHandler, ComponentType, FC, FormEventHandler, useState } from "react"
 import { Badge, Breadcrumb, Button, Card, Container, Form } from "react-bootstrap"
 import Header from "../../components/Header"
-import { TickerPrice } from "../../components/Price"
+import { MarketInstrumentPrice } from "../../components/Price"
 import { SelectFigiInput } from "../../components/SelectFigi"
-import { Ticker } from "../../components/Ticker"
+import { CandleFieldValue } from "../../components/Candle"
 import { NewDaggerCatcherType } from "../../types/DaggerCatcherType"
 import { defaultGetServerSideProps } from "../../utils"
 import { applyChangeToData, getValueFromInput } from "../../utils/defaultTypePath"
@@ -52,7 +52,7 @@ function DaggerCatcherCreatorView({ onChange, onSubmit, dagger_catcher, is_savin
                         placeholder="Click here to select..." />
                     {showTickerPrice && <Form.Text muted>
                         Current price <Badge variant="primary">
-                            <TickerPrice figi={dagger_catcher.figi} />
+                            <MarketInstrumentPrice figi={dagger_catcher.figi} />
                         </Badge>
                     </Form.Text>}
                 </Form.Group>

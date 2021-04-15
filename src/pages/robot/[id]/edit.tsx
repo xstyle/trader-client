@@ -5,7 +5,7 @@ import React, { ChangeEvent, ChangeEventHandler, FormEvent, FormEventHandler, us
 import { Alert, Badge, Breadcrumb, Button, Card, Col, Container, Form, Toast } from 'react-bootstrap'
 import { mutate } from "swr"
 import Header from '../../../components/Header'
-import { TickerPrice } from '../../../components/Price'
+import { MarketInstrumentPrice } from '../../../components/Price'
 import { robotProvider } from "../../../components/Robot/RobotProvider"
 import { RobotProviderInterface } from '../../../types/RobotType'
 import { defaultGetServerSideProps } from '../../../utils'
@@ -215,7 +215,7 @@ function InstrumentEditorView({ robot, onChange, onSubmit, alert, onRemove, onRe
                                 step="0.01" />
                             <Form.Text muted>
                                 Current price <Badge variant="primary">
-                                    <TickerPrice figi={robot.figi} />
+                                    <MarketInstrumentPrice figi={robot.figi} />
                                 </Badge>
                             </Form.Text>
                         </Form.Group>

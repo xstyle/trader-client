@@ -3,7 +3,7 @@ import { PortfolioProviderInterface } from "../types/PositioinType"
 import { LinkToTickerPage } from "./Links"
 import { portfolioProvider } from "./Portfolio/PortfolioProvider"
 import Price from "./Price"
-import { TickerProvider, useTickers } from './Ticker'
+import { MarketInstrumentAndCandleProvider, useCandles, useMarketInstrumentsIndex } from './Candle'
 
 const style: React.CSSProperties = {
     position: 'sticky',
@@ -21,24 +21,28 @@ function PortfolioCtrl<TProps extends PortfolioProviderInterface>(Component: Rea
     return (props) => {
 
         const figis = props.positions.map(position => position.figi)
-        const prices = useTickers(figis)
-        const sum: { RUB: number, USD: number } = props.positions.reduce((sum, { figi, balance, currency }) => {
+        const prices = useCandles(figis)
+        const market_instrument_index = useMarketInstrumentsIndex({ figis })
+        const sum: { RUB: number, USD: number } = props.positions.reduce((sum, { figi, balance }) => {
             if (!prices[figi]) return sum
+            const market_instrument = market_instrument_index[figi]
+            if (!market_instrument) return sum
+            const { currency } = market_instrument
             switch (currency) {
                 case "USD":
-                    sum[currency] += prices[figi].c * balance
-                    sum["RUB"] += prices[figi].c * balance * props.usd_ticker.c
+                    sum.USD += prices[figi].c * balance
+                    sum.RUB += prices[figi].c * balance * props.usd_candle.c
                     break;
                 case "RUB":
-                    sum["USD"] += prices[figi].c * balance / props.usd_ticker.c
-                    sum["RUB"] += prices[figi].c * balance
+                    sum.USD += prices[figi].c * balance / props.usd_candle.c
+                    sum.RUB += prices[figi].c * balance
                     break;
                 default:
                     break;
             }
 
             return sum
-        }, { "RUB": 0, "USD": 0 })
+        }, { RUB: 0, USD: 0 })
         return <Component
             {...props}
             sum={sum} />
@@ -46,10 +50,10 @@ function PortfolioCtrl<TProps extends PortfolioProviderInterface>(Component: Rea
 }
 
 
-export const PortfolioAmount = portfolioProvider<object>(PortfolioCtrl((props) => <Price price={props.sum["USD"]} suffix={"$"} />))
+export const PortfolioAmount = portfolioProvider<{}>(PortfolioCtrl((props) => <Price price={props.sum.USD} suffix={"$"} />))
 
-function PortfolioTableView({ positions, usd_ticker, sum }: PortfolioProviderInterface & PortfolioCtrlInterface) {
-    if (!usd_ticker) return <div>Loading USD ticker...</div>
+function PortfolioTableView({ positions, usd_candle, sum }: PortfolioProviderInterface & PortfolioCtrlInterface) {
+    if (!usd_candle) return <div>Loading USD candle...</div>
     return <Card>
         <Table
             hover
@@ -79,7 +83,7 @@ function PortfolioTableView({ positions, usd_ticker, sum }: PortfolioProviderInt
                                     <a>{position.ticker}</a>
                                 </LinkToTickerPage>
                             </th>
-                            <TickerProvider
+                            <MarketInstrumentAndCandleProvider
                                 figi={position.figi}
                                 placeholder={
                                     (<>
@@ -91,11 +95,11 @@ function PortfolioTableView({ positions, usd_ticker, sum }: PortfolioProviderInt
                                         <td>-</td>
                                     </>)
                                 }
-                                render={(ticker_info, ticker) => {
-                                    const usd_sum = ticker_info.currency == 'USD' ? ticker.c * position.balance : ticker.c * position.balance / usd_ticker.c
-                                    const rub_sum = ticker_info.currency == 'USD' ? ticker.c * position.balance * usd_ticker.c : ticker.c * position.balance
+                                render={(market_instrument, candle) => {
+                                    const usd_sum = market_instrument.currency == 'USD' ? candle.c * position.balance : candle.c * position.balance / usd_candle.c
+                                    const rub_sum = market_instrument.currency == 'USD' ? candle.c * position.balance * usd_candle.c : candle.c * position.balance
                                     return <>
-                                        <td className="text-monospace text-right">{ticker && ticker.c.toFixed(2)}</td>
+                                        <td className="text-monospace text-right">{candle && candle.c.toFixed(2)}</td>
                                         <td>{position.name}</td>
                                         <td className="text-monospace text-right">{position.balance.toFixed(2)}</td>
                                         <td className="text-monospace text-right">{position.blocked}</td>

@@ -4,8 +4,8 @@ import React from "react";
 import { Button, Card, Container, Table } from "react-bootstrap";
 import Header from "../../components/Header";
 import { LinkToTickerPage } from "../../components/Links";
-import { TickerPrice } from "../../components/Price";
-import { TickerInfo } from "../../components/Ticker";
+import { MarketInstrumentPrice } from "../../components/Price";
+import { MarketInstrumentField } from "../../components/Candle";
 import { WatchDogCtrl, WatchdogCtrlInterface, watchdogsProvider } from "../../components/WatchDog/WatchDogProvider";
 import { WatchdogProviderInterface, WatchdogsProviderInterface } from "../../types/WatchdogType";
 import { defaultGetServerSideProps } from "../../utils"
@@ -74,7 +74,7 @@ function WatchdogView({ watchdog, onToogle }: WatchdogCtrlInterface & WatchdogPr
         <th>
             <Link href={`/watchdog/${watchdog._id}`}>
                 <a>
-                    <TickerInfo
+                    <MarketInstrumentField
                         figi={watchdog.figi}
                         fieldName="name" />
                 </a>
@@ -83,14 +83,14 @@ function WatchdogView({ watchdog, onToogle }: WatchdogCtrlInterface & WatchdogPr
         <td>
             <LinkToTickerPage figi={watchdog.figi}>
                 <a>
-                    <TickerInfo
+                    <MarketInstrumentField
                         figi={watchdog.figi}
                         fieldName="ticker" />
                 </a>
             </LinkToTickerPage>
         </td>
         <td className="text-right text-nowrap">
-            <TickerPrice figi={watchdog.figi} />
+            <MarketInstrumentPrice figi={watchdog.figi} />
         </td>
         <td>{watchdog.threshold}</td>
     </tr>

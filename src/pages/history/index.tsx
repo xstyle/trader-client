@@ -5,7 +5,7 @@ import { Button, Card, Container, Table } from "react-bootstrap";
 import Moment from "react-moment";
 import { PageWithHeader } from "../../components/Header";
 import { historiesProvider, HistoriesProviderInterface } from "../../components/History/HistoryProvider";
-import { TickerInfo } from "../../components/Ticker";
+import { MarketInstrumentField } from "../../components/Candle";
 import { defaultGetServerSideProps } from "../../utils"
 
 export const getServerSideProps = defaultGetServerSideProps
@@ -59,7 +59,7 @@ function HistoriesView({ histories }: HistoriesProviderInterface) {
                                     href={`/ticker/${history.figi}`}
                                     passHref>
                                     <a>
-                                        <TickerInfo figi={history.figi} fieldName="ticker" />
+                                        <MarketInstrumentField figi={history.figi} fieldName="ticker" />
                                     </a>
                                 </Link>
                             </td>

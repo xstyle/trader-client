@@ -57,7 +57,7 @@ export function SelectFigi({ onClose, onSelect, show }: ModalProps & { onSelect(
         onHide={onClose}
         size="lg">
         <Modal.Header closeButton>
-            <Modal.Title>Select Ticker</Modal.Title>
+            <Modal.Title>Select Instrument</Modal.Title>
         </Modal.Header>
         <Modal.Body>
             <Form>
@@ -67,7 +67,7 @@ export function SelectFigi({ onClose, onSelect, show }: ModalProps & { onSelect(
                         as="input"
                         autoFocus
                         value={search}
-                        placeholder="Type text to search Ticker..."
+                        placeholder="Type text to search Instrument..."
                         onChange={handleChange}
                         type="text" />
                 </Form.Group>

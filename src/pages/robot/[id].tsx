@@ -6,7 +6,7 @@ import { Badge, Breadcrumb, Button, Col, Container, Form, ModalProps, Nav, Row }
 import { withModal } from "../../components/ChartModal"
 import Header from "../../components/Header"
 import { OrdersCtrl, OrdersCtrlInterface, ordersProvider, OrdersProviderInterface, OrdersTable } from "../../components/Orders"
-import Price, { TickerPrice, TickerPriceWithCurrency } from "../../components/Price"
+import Price, { MarketInstrumentPrice, MarketInstrumentPriceWithCurrency } from "../../components/Price"
 import { Reports } from "../../components/Reports"
 import { robotProvider, robotsProvider } from "../../components/Robot/RobotProvider"
 import { RobotCtrl, RobotCtrlInterface } from "../../components/Robots"
@@ -132,11 +132,11 @@ function RobotView({ robot, onDisable, onEnable, onSync, onCheckOrders, onResetA
     const interest = delta / robot.buy_price * 100
 
     return <>
-        <p>{robot.ticker} <Badge variant="info"><TickerPrice figi={robot.figi} /></Badge></p>
-        <p><TickerPriceWithCurrency price={robot.buy_price} figi={robot.figi} /> --- [ <TickerPriceWithCurrency price={delta} figi={robot.figi} /> (<Price suffix="%" price={interest} />) ] --&gt; <TickerPriceWithCurrency price={robot.sell_price} figi={robot.figi} /></p>
+        <p>{robot.ticker} <Badge variant="info"><MarketInstrumentPrice figi={robot.figi} /></Badge></p>
+        <p><MarketInstrumentPriceWithCurrency price={robot.buy_price} figi={robot.figi} /> --- [ <MarketInstrumentPriceWithCurrency price={delta} figi={robot.figi} /> (<Price suffix="%" price={interest} />) ] --&gt; <MarketInstrumentPriceWithCurrency price={robot.sell_price} figi={robot.figi} /></p>
         <p>Start shares number: {robot.start_shares_number}</p>
         <p>Shares number: {robot.shares_number}</p>
-        <p>Budget: <TickerPriceWithCurrency price={robot.budget} figi={robot.figi} /></p>
+        <p>Budget: <MarketInstrumentPriceWithCurrency price={robot.budget} figi={robot.figi} /></p>
         <Form.Group>
             {robot.is_enabled
                 ? <Button

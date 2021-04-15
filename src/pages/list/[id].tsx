@@ -6,8 +6,8 @@ import { Breadcrumb, Button, Card, Col, Container, Nav, Row, Table } from "react
 import Header from "../../components/Header"
 import { LinkToTickerPage } from "../../components/Links"
 import { listProvider, listsProvider } from "../../components/List/ListProvider"
-import { TickerPrice } from "../../components/Price"
-import { TickerInfo } from "../../components/Ticker"
+import { MarketInstrumentPrice } from "../../components/Price"
+import { MarketInstrumentField } from "../../components/Candle"
 import { ListProviderInterface, ListSourceUrlProviderInterface, ListsProviderInterface } from "../../types/ListType"
 import { defaultGetServerSideProps } from "../../utils"
 
@@ -98,14 +98,14 @@ function ListView({ list }: ListProviderInterface & ListSourceUrlProviderInterfa
                                 <th>
                                     <LinkToTickerPage figi={figi}>
                                         <a>
-                                            <TickerInfo
+                                            <MarketInstrumentField
                                                 figi={figi}
                                                 fieldName="ticker" />
                                         </a>
                                     </LinkToTickerPage>
                                 </th>
                                 <td className="text-right text-nowrap">
-                                    <TickerPrice figi={figi} />
+                                    <MarketInstrumentPrice figi={figi} />
                                 </td>
                             </tr>
                         )

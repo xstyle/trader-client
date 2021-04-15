@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { useTickerInfo } from "./Ticker";
+import { useMarketInstrument } from "./Candle";
 
 export function LinkToTickerPage(props: { figi: string, children: React.ReactChild }) {
     return <Link href={`/ticker/${props.figi}`}>
@@ -8,7 +8,7 @@ export function LinkToTickerPage(props: { figi: string, children: React.ReactChi
 }
 
 export function TinLink({ figi }: { figi: string }): JSX.Element {
-    const { data, error } = useTickerInfo(figi)
+    const { data, error } = useMarketInstrument(figi)
     if (error) return <>"Error"</>
     if (!data) return <>"Loading..."</>
     return <a

@@ -1,9 +1,9 @@
 import useSWR, { mutate } from "swr"
 import Link from "next/link"
-import useTicker, { TickerInfo } from "./Ticker"
+import useSuperCandle, { MarketInstrumentField } from "./Candle"
 import { HOSTNAME } from "../utils/env"
 import { Badge, Button, Card, Form, Table, ToastProps } from "react-bootstrap"
-import Price, { TickerPrice } from "./Price"
+import Price, { MarketInstrumentPrice } from "./Price"
 import { Component, CSSProperties } from "react"
 import { useRouter } from "next/router"
 import { RobotProviderInterface, RobotsProviderInterface, RobotsSourceUrlProviderInterface, RobotType } from "../types/RobotType"
@@ -61,13 +61,11 @@ function RobotsGroupView(props: RobotsProviderInterface & RobotsSourceUrlProvide
             <h4 className="mb-0 ">
                 <Link href={`/ticker/${props.figi}`}>
                     <a className="text-body">
-                        <TickerInfo figi={props.figi} fieldName={"name"} />
+                        <MarketInstrumentField figi={props.figi} fieldName={"name"} />
                     </a>
                 </Link>
             </h4>
-            <Badge variant="info"><TickerPrice figi={props.figi} /></Badge>
-            {/* <TickerPrice figi={props.figi} /> */}
-            
+            <Badge variant="info"><MarketInstrumentPrice figi={props.figi} /></Badge>
         </div>
 
         <RobotsTableView {...props} />
@@ -76,13 +74,13 @@ function RobotsGroupView(props: RobotsProviderInterface & RobotsSourceUrlProvide
 }
 
 function RobotFooter(props: RobotsProviderInterface & RobotsSourceUrlProviderInterface & { figi: string }) {
-    const ticker = useTicker(props.figi)
-    if (!ticker)
+    const candle = useSuperCandle(props.figi)
+    if (!candle)
         return null
     const consolidate_budget = props.robots.reduce((sum, robot) => sum + robot.budget, 0)
     const consolidate_shares_number = props.robots.reduce((sum, robot) => sum + robot.shares_number, 0)
 
-    const online_budget = consolidate_shares_number * ticker.c + consolidate_budget
+    const online_budget = consolidate_shares_number * candle.c + consolidate_budget
 
     return <tfoot style={footer_style}>
         <tr>
@@ -190,7 +188,7 @@ export function RobotCtrl<TProps extends RobotProviderInterface>(Component: Reac
 }
 
 function RobotView({ robot, onEnable, onDisable }: RobotCtrlInterface & RobotProviderInterface) {
-    const ticker = useTicker(robot.figi)
+    const candle = useSuperCandle(robot.figi)
     const { query } = useRouter()
     return <tr >
         <td>
@@ -208,11 +206,6 @@ function RobotView({ robot, onEnable, onDisable }: RobotCtrlInterface & RobotPro
                 [{robot.min_shares_number}...{robot.max_shares_number}]
             </div>
         </td>
-        {/* <td className="text-right text-monospace">
-            {ticker && <Pricemetr
-                price={ticker.c}
-                {...robot} />}
-        </td> */}
         <td className="text-right text-monospace">
             <div><Price price={robot.buy_price} /></div>
             <div className="small text-muted">
@@ -242,7 +235,7 @@ function RobotView({ robot, onEnable, onDisable }: RobotCtrlInterface & RobotPro
             <Price price={robot.budget} />
         </td>
         <td className="text-right">
-            {ticker && <Price price={robot.budget + ticker.c * robot.shares_number} />}
+            {candle && <Price price={robot.budget + candle.c * robot.shares_number} />}
             {robot.shares_number > robot.min_shares_number && <Form.Text className="text-muted">
                 (<Price price={robot.budget + robot.sell_price * (robot.shares_number - robot.min_shares_number)} />)
             </Form.Text>}

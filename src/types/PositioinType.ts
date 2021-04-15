@@ -1,4 +1,5 @@
-import { TickerData } from "./TickerType";
+import { PortfolioPosition } from "@tinkoff/invest-openapi-js-sdk/build/domain.d";
+import { SuperCandle } from "./CandleType";
 
 export type Position = {
     ticker: string,
@@ -12,6 +13,6 @@ export type Position = {
 }
 
 export interface PortfolioProviderInterface {
-    positions: Position[]
-    usd_ticker: TickerData
+    positions: PortfolioPosition[]
+    usd_candle: SuperCandle
 }

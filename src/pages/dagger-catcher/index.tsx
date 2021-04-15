@@ -6,7 +6,7 @@ import { withModal } from "../../components/ChartModal"
 import { daggerCatchersProvider } from "../../components/DaggerCatcher/DaggerCatcherProvider"
 import Header from "../../components/Header"
 import { TinLink } from "../../components/Links"
-import { TickerInfo, tickerProvider, TickerProviderInterface } from "../../components/Ticker"
+import { MarketInstrumentField, lastCandleProvider, LastCandleProviderInterface } from "../../components/Candle"
 import { DaggerCatchersProviderInterface } from "../../types/DaggerCatcherType"
 import { defaultGetServerSideProps } from "../../utils"
 
@@ -67,7 +67,7 @@ function View({ daggerCatchers }: DaggerCatchersProviderInterface) {
                                 <Link
                                     href={`/dagger-catcher/${daggerCatcher.figi}`}>
                                     <a>
-                                        <TickerInfo
+                                        <MarketInstrumentField
                                             figi={daggerCatcher.figi}
                                             fieldName="ticker" />
                                     </a>
@@ -103,11 +103,11 @@ function View({ daggerCatchers }: DaggerCatchersProviderInterface) {
     </Card>
 }
 
-function ColorPriceView({ ticker }: TickerProviderInterface) {
-    if (!ticker) return null
-    return <span className={ticker.change && (ticker.change > 0) ? "text-success" : ticker.change && (ticker.change < 0) ? "text-danger" : ""}>{ticker.c.toFixed(2)}</span>
+function ColorPriceView({ candle }: LastCandleProviderInterface) {
+    if (!candle) return null
+    return <span className={candle.change && (candle.change > 0) ? "text-success" : candle.change && (candle.change < 0) ? "text-danger" : ""}>{candle.c.toFixed(2)}</span>
 }
 
-const ColorPrice = tickerProvider(ColorPriceView)
+const ColorPrice = lastCandleProvider(ColorPriceView)
 
 const ModalChart = withModal(({ onShow }: ModalProps) => (<Button variant="link" size="sm" onClick={onShow}>Chart</Button>))

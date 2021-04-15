@@ -4,8 +4,8 @@ import { Button, Container, Table } from "react-bootstrap"
 import useSWR from "swr"
 import { defaultGetServerSideProps } from "../utils"
 import Header from "../components/Header"
-import { TickerPrice, TickerPriceWithCurrency } from "../components/Price"
-import { TickerInfo } from "../components/Ticker"
+import { MarketInstrumentPrice, MarketInstrumentPriceWithCurrency } from "../components/Price"
+import { MarketInstrumentField } from "../components/Candle"
 import { HOSTNAME } from "../utils/env"
 
 
@@ -99,14 +99,14 @@ const OrdersView = (props: OrdersProviderInterface & OrdersCtrlInterface) => (
                     <tr key={order.orderId}>
                         <td>
                             <Link href={`/ticker/${order.figi}`}>
-                                <a><TickerInfo figi={order.figi} fieldName={"ticker"} /></a>
+                                <a><MarketInstrumentField figi={order.figi} fieldName={"ticker"} /></a>
                             </Link>
                         </td>
                         <td>{order.operation}</td>
                         <td>{order.requestedLots}</td>
                         <td>{order.executedLots}</td>
-                        <td><TickerPriceWithCurrency price={order.price} figi={order.figi} /></td>
-                        <td><TickerPrice figi={order.figi} /></td>
+                        <td><MarketInstrumentPriceWithCurrency price={order.price} figi={order.figi} /></td>
+                        <td><MarketInstrumentPrice figi={order.figi} /></td>
                         <td>{order.orderId}</td>
                         <td>
                             <Button onClick={() => props.onDecline(order)}>Decline</Button>
