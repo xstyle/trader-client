@@ -1,4 +1,3 @@
-import { type } from 'os'
 import { TickerData } from '../types/TickerType'
 import { socket } from './io'
 
@@ -138,5 +137,5 @@ class SubscribeService {
         return this.socket_subscriber[figi][interval]
     }
 }
-
-export default new SubscribeService()
+const subscribeService = new SubscribeService()
+export default subscribeService

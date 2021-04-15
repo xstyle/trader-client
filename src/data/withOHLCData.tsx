@@ -4,29 +4,10 @@ import * as React from "react";
 import { IOHLCData } from "./iOHLCData";
 
 import { HOSTNAME } from "../utils/env"
-import subscribe, { Interval } from "../utils/subscribe.service"
+import  subscribeService, { Interval } from "../utils/subscribe.service"
 import moment from "moment";
 
 const parseDate = timeParse("%Y-%m-%d");
-
-// const parseData = () => {
-//     return (d: any) => {
-//         const date = parseDate(d.date);
-//         if (date === null) {
-//             d.date = new Date(Number(d.date));
-//         } else {
-//             d.date = new Date(date);
-//         }
-
-//         for (const key in d) {
-//             if (key !== "date" && Object.prototype.hasOwnProperty.call(d, key)) {
-//                 d[key] = +d[key];
-//             }
-//         }
-
-//         return d as IOHLCData;
-//     };
-// };
 
 interface WithOHLCDataProps {
     readonly data: IOHLCData[];
@@ -50,7 +31,7 @@ export function withOHLCData(dataSet = "DAILY") {
             }
             public subscribtion?: ()=> void
             subscribe() {
-                this.subscribtion = subscribe.subscribe(this.props, (obj: { time: string, o: number, h: number, l: number, c: number, v: number }) => {
+                this.subscribtion = subscribeService.subscribe(this.props, (obj: { time: string, o: number, h: number, l: number, c: number, v: number }) => {
                     const updated_item = driver(obj)
                     updated_item.date = moment(updated_item.date).toDate()
 
