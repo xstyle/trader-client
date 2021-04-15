@@ -7,7 +7,7 @@ import { ReportDay } from "../types/ReportDayType"
 import { OrderType } from "../types/OrderType"
 import { Paginator, PaginatorInterface } from "../utils/pagination"
 
-const Chart = dynamic<{ data: any }>(() => import("./Charts").then((mod) => mod.Chart), { ssr: false })
+const Chart = dynamic<{ data: ReportDay[] }>(() => import("./Charts").then((mod) => mod.Chart), { ssr: false })
 
 interface ReportCtrlInterface {
     days: ReportDay[]
