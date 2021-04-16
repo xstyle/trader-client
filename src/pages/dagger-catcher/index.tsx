@@ -52,9 +52,9 @@ function View({ daggerCatchers }: DaggerCatchersProviderInterface) {
             size="sm">
             <thead>
                 <tr>
-                    <th>Name</th>
-                    <th className="text-right">Price</th>
-                    <th>Tinkoff</th>
+                    <th style={{ width: "1px" }}>Ticker</th>
+                    <th style={{ width: "1px" }} className="text-right">Price</th>
+                    <th>App</th>
                     <th>Charts</th>
                     <th></th>
                 </tr>
@@ -92,7 +92,7 @@ function View({ daggerCatchers }: DaggerCatchersProviderInterface) {
                                     passHref>
                                     <Button
                                         size="sm"
-                                        variant="outline-success">Edit</Button>
+                                        variant="secondary"><i className="fa fa-edit" /></Button>
                                 </Link>
                             </td>
                         </tr>

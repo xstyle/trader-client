@@ -15,7 +15,7 @@ export function TinLink({ figi }: { figi: string }): JSX.Element {
         href={`https://www.tinkoff.ru/invest/stocks/${data.ticker}`}
         target="_blank"
         rel="noreferrer" >
-        Tinkoff
+        App
     </a>
 }
 
