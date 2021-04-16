@@ -31,7 +31,7 @@ function Body() {
     const id = Array.isArray(figi) || !figi ? undefined : figi
     return <Container fluid>
         <Row>
-            <Col lg="2">
+            <Col lg="2" className="d-none d-sm-block">
                 <Sidebar id={id} />
             </Col>
             <Col lg="10">
@@ -104,28 +104,36 @@ function MainView({ query }: { query: { tag?: string | string[], figi?: string |
         {(query.tag || query.figi) &&
             <Form.Group>
                 {
-                    tags.map(tag => (
-                        <Link href={{
-                            pathname: '/robot',
-                            query: {
-                                ...query,
-                                tag: undefined
-                            }
-                        }}>
-                            <a className="badge badge-primary">{tag} <span aria-hidden="true">&times;</span></a>
+                    tags.map((tag, index) => (
+                        <Link
+                            key={tag + index}
+                            href={{
+                                pathname: '/robot',
+                                query: {
+                                    ...query,
+                                    tag: undefined
+                                }
+                            }}>
+                            <a className="badge badge-primary">
+                                {tag} <span aria-hidden="true">&times;</span>
+                            </a>
                         </Link>
                     ))
                 }
                 {
-                    figis.map(figi => (
-                        <Link href={{
-                            pathname: '/robot',
-                            query: {
-                                ...query,
-                                figi: undefined
-                            }
-                        }}>
-                            <a className="badge badge-primary"><MarketInstrumentField figi={figi} fieldName="name" /> <span aria-hidden="true">&times;</span></a>
+                    figis.map((figi, index) => (
+                        <Link
+                            key={figi + index}
+                            href={{
+                                pathname: '/robot',
+                                query: {
+                                    ...query,
+                                    figi: undefined
+                                }
+                            }}>
+                            <a className="badge badge-primary">
+                                <MarketInstrumentField figi={figi} fieldName="name" /> <span aria-hidden="true">&times;</span>
+                            </a>
                         </Link>
                     ))
                 }

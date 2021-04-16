@@ -1,12 +1,12 @@
-import useSWR, { mutate } from "swr"
 import Link from "next/link"
-import useSuperCandle, { MarketInstrumentField } from "./Candle"
-import { HOSTNAME } from "../utils/env"
-import { Badge, Button, Card, Form, Table, ToastProps } from "react-bootstrap"
-import Price, { MarketInstrumentPrice } from "./Price"
-import { Component, CSSProperties } from "react"
 import { useRouter } from "next/router"
+import { CSSProperties } from "react"
+import { Button, Col, Form, Row, Table } from "react-bootstrap"
+import { mutate } from "swr"
 import { RobotProviderInterface, RobotsProviderInterface, RobotsSourceUrlProviderInterface, RobotType } from "../types/RobotType"
+import { HOSTNAME } from "../utils/env"
+import useSuperCandle, { MarketInstrumentField } from "./Candle"
+import Price, { MarketInstrumentPrice } from "./Price"
 import { robotsProvider } from "./Robot/RobotProvider"
 
 function interest(robot: RobotType) {
@@ -57,19 +57,25 @@ const style: CSSProperties = {
 }
 function RobotsGroupView(props: RobotsProviderInterface & RobotsSourceUrlProviderInterface & { figi: string }) {
     return <div className="">
-        <div style={style}  className="pb-2 pt-2">
-            <h4 className="mb-0 ">
-                <Link href={`/ticker/${props.figi}`}>
-                    <a className="text-body">
-                        <MarketInstrumentField figi={props.figi} fieldName={"name"} />
-                    </a>
-                </Link>
-            </h4>
-            <Badge variant="info"><MarketInstrumentPrice figi={props.figi} /></Badge>
+        <div style={style} className="pb-2 pt-2">
+            <Row>
+                <Col xs="auto">
+                    <h4 className="mb-0 ">
+                        <Link href={`/ticker/${props.figi}`}>
+                            <a className="text-body">
+                                <MarketInstrumentField figi={props.figi} fieldName={"ticker"} />
+                            </a>
+                        </Link>
+                    </h4>
+                </Col>
+                <Col className="align-self-end">
+                    <MarketInstrumentPrice figi={props.figi} />
+                </Col>
+            </Row>
+
         </div>
 
         <RobotsTableView {...props} />
-        <hr></hr>
     </div>
 }
 
@@ -111,6 +117,7 @@ function RobotsTableView(props: RobotsProviderInterface & RobotsSourceUrlProvide
             hover
             size="sm"
             className="mb-0"
+            bordered
         >
             <thead
                 style={top_style}>
@@ -197,7 +204,7 @@ function RobotView({ robot, onEnable, onDisable }: RobotCtrlInterface & RobotPro
                 passHref>
                 <Button
                     size="sm"
-                    variant="secondary"><i className="fa fa-info"/></Button>
+                    variant="secondary"><i className="fa fa-info" /></Button>
             </Link>
         </td>
         <td className="text-right text-monospace">
@@ -266,7 +273,7 @@ function RobotView({ robot, onEnable, onDisable }: RobotCtrlInterface & RobotPro
                 passHref>
                 <Button
                     size="sm"
-                    variant={"secondary"}><i className="fa fa-edit"/></Button>
+                    variant={"secondary"}><i className="fa fa-edit" /></Button>
             </Link>
         </td>
     </tr>
