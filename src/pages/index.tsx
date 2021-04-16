@@ -20,7 +20,7 @@ function Page() {
 
 
 function Body() {
-    const start_date = moment().add(-2, 'h').startOf('day').hours(10).toISOString()
+    const start_date = moment().add(-2, 'h').startOf('day').hours(7).toISOString()
     const end_date = moment().add(-2, 'h').endOf('day').add(2, 'h').toISOString()
 
     return <Container fluid>
