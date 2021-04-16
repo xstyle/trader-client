@@ -1,10 +1,10 @@
-import { Candle } from '@tinkoff/invest-openapi-js-sdk/build/domain.d'
+import { Candle, CandleResolution } from '@tinkoff/invest-openapi-js-sdk/build/domain.d'
 import { socket } from './io'
 
-export type Interval = "1min" | "1day"
+//export type Interval = "1min" | "1day"
 interface Subscriber {
     figi: string,
-    interval: Interval
+    interval: CandleResolution
 }
 type RootSubscriberCallback = (data: Candle) => void
 type SubscriberCallback = (data: Candle, last_data?: Candle) => void
@@ -24,9 +24,9 @@ class SubscribeService {
 
     connected = false
     attempt_amount = 0
-    subscribers: { [id: string]: { [id in Interval]?: SubscriberCallback[] } } = {}
-    socket_subscriber: { [id: string]: { [id in Interval]?: RootSubscriberCallback } } = {}
-    old_values: { [id: string]: { [id in Interval]?: Candle } } = {}
+    subscribers: { [id: string]: { [id in CandleResolution]?: SubscriberCallback[] } } = {}
+    socket_subscriber: { [id: string]: { [id in CandleResolution]?: RootSubscriberCallback } } = {}
+    old_values: { [id: string]: { [id in CandleResolution]?: Candle } } = {}
 
     resubscribe() {
         this.getAllRootSubscribers()
@@ -36,7 +36,7 @@ class SubscribeService {
             })
     }
 
-    subscribe({ figi, interval = '1min' }: { figi: string, interval?: Interval }, cb: SubscriberCallback) {
+    subscribe({ figi, interval = '1min' }: { figi: string, interval?: CandleResolution }, cb: SubscriberCallback) {
         //console.log(`Subscribe to ${figi} ${interval}`)
         this.addSubscriber({ figi, interval, cb })
 
@@ -87,7 +87,7 @@ class SubscribeService {
         return rootSubscriberCallback
     }
 
-    setOldValue({ figi, interval, data }: { figi: string, interval: Interval, data: Candle }): void {
+    setOldValue({ figi, interval, data }: { figi: string, interval: CandleResolution, data: Candle }): void {
         if (!this.old_values[figi]) this.old_values[figi] = { [interval]: data }
         this.old_values[figi][interval] = data
     }
@@ -113,7 +113,7 @@ class SubscribeService {
     getAllRootSubscribers(): Subscriber[] {
         const rootSubscribers: Subscriber[] = []
         for (const figi of Object.keys(this.subscribers)) {
-            for (const interval of Object.keys(this.subscribers[figi]) as Interval[]) {
+            for (const interval of Object.keys(this.subscribers[figi]) as CandleResolution[]) {
                 rootSubscribers.push({ figi, interval })
             }
         }
@@ -126,7 +126,7 @@ class SubscribeService {
         this.subscribers[figi][interval]?.push(cb)
     }
 
-    setRootSubscriber({ figi, interval, cb }: { figi: string, interval: Interval, cb: RootSubscriberCallback }): void {
+    setRootSubscriber({ figi, interval, cb }: { figi: string, interval: CandleResolution, cb: RootSubscriberCallback }): void {
         if (!this.socket_subscriber[figi]) this.socket_subscriber[figi] = { [interval]: cb }
         else this.socket_subscriber[figi][interval] = cb
     }

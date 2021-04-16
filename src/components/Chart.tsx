@@ -1,6 +1,7 @@
-import { format } from "d3-format";
-import { timeFormat } from "d3-time-format";
-import * as React from "react";
+import { CandleResolution } from "@tinkoff/invest-openapi-js-sdk/build/domain.d"
+import { format } from "d3-format"
+import { timeFormat } from "d3-time-format"
+import * as React from "react"
 import {
     elderRay,
     ema,
@@ -25,9 +26,8 @@ import {
     ZoomButtons,
     withDeviceRatio,
     withSize,
-} from "react-financial-charts";
-import { IOHLCData, withOHLCData } from "../data";
-import { Interval } from "../utils/subscribe.service";
+} from "react-financial-charts"
+import { IOHLCData, withOHLCData } from "../data"
 
 interface StockChartProps {
     readonly data: IOHLCData[];
@@ -36,12 +36,12 @@ interface StockChartProps {
     readonly width: number;
     readonly ratio: number;
     readonly figi: string;
-    readonly interval?: Interval;
+    readonly interval?: CandleResolution;
 }
 
 class StockChart extends React.Component<StockChartProps> {
-    private readonly margin = { left: 0, right: 48, top: 0, bottom: 24 };
-    private readonly pricesDisplayFormat = format(".2f");
+    private readonly margin = { left: 0, right: 48, top: 0, bottom: 24 }
+    private readonly pricesDisplayFormat = format(".2f")
     private readonly xScaleProvider = discontinuousTimeScaleProviderBuilder().inputDateAccessor(
         (d: IOHLCData) => d.date,
     );
@@ -55,7 +55,7 @@ class StockChart extends React.Component<StockChartProps> {
             .merge((d: any, c: any) => {
                 d.ema12 = c;
             })
-            .accessor((d: any) => d.ema12);
+            .accessor((d: any) => d.ema12)
 
         const ema26 = ema()
             .id(2)
@@ -63,29 +63,29 @@ class StockChart extends React.Component<StockChartProps> {
             .merge((d: any, c: any) => {
                 d.ema26 = c;
             })
-            .accessor((d: any) => d.ema26);
+            .accessor((d: any) => d.ema26)
 
-        const elder = elderRay();
+        const elder = elderRay()
 
-        const calculatedData = elder(ema26(ema12(initialData)));
+        const calculatedData = elder(ema26(ema12(initialData)))
 
-        const { margin, xScaleProvider } = this;
+        const { margin, xScaleProvider } = this
 
-        const { data, xScale, xAccessor, displayXAccessor } = xScaleProvider(calculatedData);
+        const { data, xScale, xAccessor, displayXAccessor } = xScaleProvider(calculatedData)
 
-        const max = xAccessor(data[data.length - 1]);
-        const min = xAccessor(data[Math.max(0, data.length - 100)]);
-        const xExtents = [min, max + 5];
+        const max = xAccessor(data[data.length - 1])
+        const min = xAccessor(data[Math.max(0, data.length - 100)])
+        const xExtents = [min, max + 5]
 
-        const gridHeight = height - margin.top - margin.bottom;
+        const gridHeight = height - margin.top - margin.bottom
 
-        const elderRayHeight = 100;
-        const elderRayOrigin = (_: number, h: number) => [0, h - elderRayHeight];
-        const barChartHeight = gridHeight / 4;
-        const barChartOrigin = (_: number, h: number) => [0, h - barChartHeight - elderRayHeight];
-        const chartHeight = gridHeight - elderRayHeight;
+        const elderRayHeight = 100
+        const elderRayOrigin = (_: number, h: number) => [0, h - elderRayHeight]
+        const barChartHeight = gridHeight / 4
+        const barChartOrigin = (_: number, h: number) => [0, h - barChartHeight - elderRayHeight]
+        const chartHeight = gridHeight - elderRayHeight
 
-        const timeDisplayFormat = timeFormat(dateTimeFormat);
+        const timeDisplayFormat = timeFormat(dateTimeFormat)
 
         return (
             <ChartCanvas
@@ -172,38 +172,30 @@ class StockChart extends React.Component<StockChartProps> {
     }
 
     private readonly barChartExtents = (data: IOHLCData) => {
-        return data.volume;
-    };
+        return data.volume
+    }
 
     private readonly candleChartExtents = (data: IOHLCData) => {
-        return [data.high, data.low];
-    };
+        return [data.high, data.low]
+    }
 
     private readonly yEdgeIndicator = (data: IOHLCData) => {
-        return data.close;
-    };
+        return data.close
+    }
 
     private readonly volumeColor = (data: IOHLCData) => {
-        return data.close > data.open ? "rgba(38, 166, 154, 0.3)" : "rgba(239, 83, 80, 0.3)";
-    };
+        return data.close > data.open ? "rgba(38, 166, 154, 0.3)" : "rgba(239, 83, 80, 0.3)"
+    }
 
     private readonly volumeSeries = (data: IOHLCData) => {
-        return data.volume;
-    };
+        return data.volume
+    }
 
     private readonly openCloseColor = (data: IOHLCData) => {
-        return data.close > data.open ? "#26a69a" : "#ef5350";
-    };
+        return data.close > data.open ? "#26a69a" : "#ef5350"
+    }
 }
 
 export default withOHLCData()(
-    withSize({ style: { minHeight: 500 } })(withDeviceRatio()(StockChart))
-);
-
-// export const MinutesStockChart = withOHLCData("MINUTES")(
-//     withSize({ style: { minHeight: 600 } })(withDeviceRatio()(StockChart))
-// );
-
-// export const SecondsStockChart = withOHLCData("SECONDS")(
-//     withSize({ style: { minHeight: 600 } })(withDeviceRatio()(StockChart))
-// );
+    withSize({ style: { minHeight: 300 } })(withDeviceRatio()(StockChart))
+)

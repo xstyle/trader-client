@@ -4,15 +4,16 @@ import * as React from "react";
 import { IOHLCData } from "./iOHLCData";
 
 import { HOSTNAME } from "../utils/env"
-import  subscribeService, { Interval } from "../utils/subscribe.service"
+import subscribeService from "../utils/subscribe.service"
 import moment from "moment";
+import { CandleResolution } from "@tinkoff/invest-openapi-js-sdk/build/domain.d";
 
 const parseDate = timeParse("%Y-%m-%d");
 
 interface WithOHLCDataProps {
     readonly data: IOHLCData[];
     readonly figi: string;
-    readonly interval?: Interval;
+    readonly interval?: CandleResolution;
 }
 
 interface WithOHLCState {
@@ -29,7 +30,7 @@ export function withOHLCData(dataSet = "DAILY") {
                     message: `Loading ${dataSet} data...`,
                 };
             }
-            public subscribtion?: ()=> void
+            public subscribtion?: () => void
             subscribe() {
                 this.subscribtion = subscribeService.subscribe(this.props, (obj: { time: string, o: number, h: number, l: number, c: number, v: number }) => {
                     const updated_item = driver(obj)
@@ -56,9 +57,9 @@ export function withOHLCData(dataSet = "DAILY") {
             }
             loadDataAndSubscribe() {
                 const url = new URL(`/ticker/${this.props.figi}/candles`, `http://${HOSTNAME}:3001`)
-
-                if (typeof this.props.interval !== "undefined") {
-                    url.searchParams.set('interval', this.props.interval as string)
+                const { interval } = this.props
+                if (interval) {
+                    url.searchParams.set('interval', interval as string)
                 }
 
                 const source_url = url.href
@@ -87,8 +88,8 @@ export function withOHLCData(dataSet = "DAILY") {
                 this.unsubscribe()
             }
 
-            componentDidUpdate(prevProps: { figi: string }) {
-                if (this.props.figi !== prevProps.figi) {
+            componentDidUpdate(prevProps: TProps) {
+                if (this.props.figi !== prevProps.figi || this.props.interval !== prevProps.interval) {
                     return this.loadDataAndSubscribe();
                 }
             }
@@ -99,7 +100,7 @@ export function withOHLCData(dataSet = "DAILY") {
                     return <div className="center">{message}</div>;
                 }
 
-                return <OriginalComponent {...(this.props as TProps)} data={data} />;
+                return <OriginalComponent {...this.props as TProps} data={data} />;
             }
         };
     };
