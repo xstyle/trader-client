@@ -6,6 +6,7 @@ export type NewDaggerCatcherType = {
 
 export type DaggerCatcherType = NewDaggerCatcherType & {
     _id: string;
+    is_pinned: boolean;
 }
 
 export interface DaggerCatcherSourceUrlProviderInterface {

@@ -1,23 +1,21 @@
 import Head from 'next/head';
 import Link from "next/link";
 import { useRouter } from "next/router";
-import { ChangeEventHandler, ComponentType, CSSProperties, FC, useEffect, useState } from "react";
+import { CSSProperties } from "react";
 import { Badge, Breadcrumb, Button, Card, Col, Container, Form, Nav, Row } from "react-bootstrap";
 import Moment from "react-moment";
 import Chart from "../../components/Chart";
 import { daggerCatcherProvider, daggerCatchersProvider } from '../../components/DaggerCatcher/DaggerCatcherProvider';
 import Header from "../../components/Header";
-import { MutateOrders, OrdersCtrl, OrdersCtrlInterface, ordersProvider, OrdersProviderInterface, OrdersSourceUrlProviderOptions, OrdersTable } from "../../components/Orders";
+import { OrdersCtrl, OrdersCtrlInterface, ordersProvider, OrdersProviderInterface, OrdersSourceUrlProviderOptions, OrdersTable } from "../../components/Orders";
 import Price, { ColorPriceView, MarketInstrumentPrice } from "../../components/Price";
 import { Reports } from '../../components/Reports';
 import { useStatistica } from '../../components/Statistic/Statistic';
-import useSuperCandle, { MarketInstrumentField, useMarketInstrument } from "../../components/Candle";
+import useSuperCandle, { MarketInstrumentField } from "../../components/Candle";
 import { DaggerCatcherProviderInterface, DaggerCatchersProviderInterface } from '../../types/DaggerCatcherType';
-import { SuperCandle } from "../../types/CandleType";
 import { OrderType } from "../../types/OrderType";
 import { defaultGetServerSideProps } from "../../utils";
-import { getValueFromInput } from "../../utils/defaultTypePath";
-import { MarketInstrument } from '@tinkoff/invest-openapi-js-sdk/build/domain.d';
+import { DaggerCatcherCtrl, DaggerCatcherCtrlInterface } from '../../components/DaggerCatcher/DaggerCatcherController';
 
 export const getServerSideProps = defaultGetServerSideProps
 
@@ -120,95 +118,24 @@ const Orders = ordersProvider(
     )
 )
 
-interface DaggerCatcherCtrlInterface {
-    marketInstrument: MarketInstrument,
-    candle: SuperCandle,
-    state: {
-        price: number,
-        min: number,
-        max: number,
-        step: number,
-        lots: number
-    },
-    onChange: ChangeEventHandler<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>,
-    onSubmit(operation: "Sell" | "Buy"): void,
-}
-
-function DaggerCatcherCtrl<TProps extends DaggerCatcherProviderInterface>(Component: ComponentType<TProps & DaggerCatcherCtrlInterface>): FC<TProps> {
-    return (props) => {
-        const candle = useSuperCandle(props.daggerCatcher.figi)
-        const { error, data: marketInstrument } = useMarketInstrument(props.daggerCatcher.figi)
-
-        const initialState = {
-            price: Math.round((props.daggerCatcher.max + props.daggerCatcher.min) * 100 / 2) / 100,
-            min: props.daggerCatcher.min,
-            max: props.daggerCatcher.max,
-            step: 0.1,
-            lots: 1,
-        };
-
-        const [state, setState] = useState(initialState)
-
-        useEffect(() => {
-            setState(initialState)
-        }, [props.daggerCatcher])
-
-        if (error) return <div>Error</div>
-        if (!candle || !marketInstrument) return <div>Loading...</div>
-
-        const handleChange: ChangeEventHandler<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement> = (event) => {
-            const { target } = event
-            const { name } = target
-            const value = getValueFromInput(target)
-            setState({ ...state, [name]: value })
-        }
-
-        async function handleSubmit(operation: "Sell" | "Buy") {
-            try {
-                await fetch(`${props.source_url}/order`, {
-                    method: 'POST',
-                    body: JSON.stringify({ ...state, operation }),
-                    headers: {
-                        'Content-Type': 'application/json'
-                    }
-                })
-                MutateOrders({
-                    figi: props.daggerCatcher.figi,
-                    collection: props.daggerCatcher._id
-                })
-            } catch (err) {
-                console.error(err)
-            }
-        }
-
-        return <Component
-            {...props}
-            state={state}
-            onSubmit={handleSubmit}
-            onChange={handleChange}
-            candle={candle}
-            marketInstrument={marketInstrument} />
-    }
-}
-
-function DaggerCatcherView({ daggerCatcher: catcher, marketInstrument, onSubmit, state, onChange, candle }: DaggerCatcherProviderInterface & DaggerCatcherCtrlInterface) {
+function DaggerCatcherView({ daggerCatcher: catcher, onSubmit, state, onChange }: DaggerCatcherProviderInterface & DaggerCatcherCtrlInterface) {
     return <>
         <Head>
-            <title>${marketInstrument.ticker} {candle.c.toFixed(2)}</title>
+            {/* <title>${marketInstrument.ticker} {candle.c.toFixed(2)}</title> */}
         </Head>
         <Breadcrumb>
             <Link href="/dagger-catcher" passHref>
                 <Breadcrumb.Item>Dagger Catchers</Breadcrumb.Item>
             </Link>
-            <Breadcrumb.Item active>{marketInstrument.name}</Breadcrumb.Item>
+            {/* <Breadcrumb.Item active>{marketInstrument.name}</Breadcrumb.Item> */}
         </Breadcrumb>
         <Row>
             <Col sm="12" md="6">
                 <p className="text-monospace display-3 text-center">
-                    <ColorPriceView candle={candle} />
+                    {/* <ColorPriceView candle={candle} /> */}
                 </p>
-                <p className="text-monospace text-center">{candle.v.toFixed(0)} shares for <Moment durationFromNow interval={100}>{candle.time}</Moment></p>
-                <p className="text-monospace text-center">{(candle.v * 1000 / (Date.now() - new Date(candle.time).getTime())).toFixed(0)} shares per second</p>
+                {/* <p className="text-monospace text-center">{candle.v.toFixed(0)} shares for <Moment durationFromNow interval={100}>{candle.time}</Moment></p> */}
+                {/* <p className="text-monospace text-center">{(candle.v * 1000 / (Date.now() - new Date(candle.time).getTime())).toFixed(0)} shares per second</p> */}
                 <Card className="mb-4">
                     <Card.Body>
                         <Form>
