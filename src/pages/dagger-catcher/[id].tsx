@@ -11,7 +11,7 @@ import { OrdersCtrl, OrdersCtrlInterface, ordersProvider, OrdersProviderInterfac
 import Price, { ColorPriceView, MarketInstrumentPrice } from "../../components/Price";
 import { Reports } from '../../components/Reports';
 import { useStatistica } from '../../components/Statistic/Statistic';
-import useSuperCandle, { MarketInstrumentField } from "../../components/Candle";
+import useSuperCandle, { MarketInstrumentField, useMarketInstrument } from "../../components/Candle";
 import { DaggerCatcherProviderInterface, DaggerCatchersProviderInterface } from '../../types/DaggerCatcherType';
 import { OrderType } from "../../types/OrderType";
 import { defaultGetServerSideProps } from "../../utils";
@@ -119,23 +119,31 @@ const Orders = ordersProvider(
 )
 
 function DaggerCatcherView({ daggerCatcher: catcher, onSubmit, state, onChange }: DaggerCatcherProviderInterface & DaggerCatcherCtrlInterface) {
+    const candle = useSuperCandle(catcher.figi)
+    const { data: marketInstrument } = useMarketInstrument(catcher.figi)
     return <>
         <Head>
-            {/* <title>${marketInstrument.ticker} {candle.c.toFixed(2)}</title> */}
+            <title>{marketInstrument && marketInstrument.ticker} {candle && candle.c.toFixed(2)}</title>
         </Head>
         <Breadcrumb>
             <Link href="/dagger-catcher" passHref>
                 <Breadcrumb.Item>Dagger Catchers</Breadcrumb.Item>
             </Link>
-            {/* <Breadcrumb.Item active>{marketInstrument.name}</Breadcrumb.Item> */}
+            <Breadcrumb.Item active>
+                <MarketInstrumentField figi={catcher.figi} fieldName={"ticker"} />
+            </Breadcrumb.Item>
         </Breadcrumb>
         <Row>
             <Col sm="12" md="6">
                 <p className="text-monospace display-3 text-center">
-                    {/* <ColorPriceView candle={candle} /> */}
+                    <MarketInstrumentPrice figi={catcher.figi} color />
                 </p>
-                {/* <p className="text-monospace text-center">{candle.v.toFixed(0)} shares for <Moment durationFromNow interval={100}>{candle.time}</Moment></p> */}
-                {/* <p className="text-monospace text-center">{(candle.v * 1000 / (Date.now() - new Date(candle.time).getTime())).toFixed(0)} shares per second</p> */}
+                {
+                    candle && <>
+                        <p className="text-monospace text-center">{candle.v.toFixed(0)} shares for <Moment durationFromNow interval={100}>{candle.time}</Moment></p>
+                        <p className="text-monospace text-center">{(candle.v * 1000 / (Date.now() - new Date(candle.time).getTime())).toFixed(0)} shares per second</p>
+                    </>
+                }
                 <Card className="mb-4">
                     <Card.Body>
                         <Form>

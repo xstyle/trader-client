@@ -11,30 +11,46 @@ export default function Price({ suffix = "", price, as = "span", className = "" 
 
 
 
-export function MarketInstrumentPriceWithCurrency({ figi, price, className }: { figi: string, price: number, className?: string }) {
+export function MarketInstrumentPriceWithCurrency({ figi, price, className = "", currency = false, color = false, change = 0 }: { figi: string, price: number, className?: string, currency?: boolean, color?: boolean, change?: number }) {
     const { data: marketInstrument, error } = useMarketInstrument(figi)
     if (!marketInstrument || error) return <Price suffix="---" price={price} />
-    return <Price suffix={marketInstrument.currency} price={price} className={className} />
+    const classNameColor = !color ? "" : change === 0 ? "" : change > 0 ? "text-success" : "text-danger"
+    return <Price
+        suffix={currency ? marketInstrument.currency : undefined}
+        price={price}
+        className={`${className} ${classNameColor}`} />
 }
 
 interface InstrumentPrice {
-    figi: string,
-    placeholder?: number,
-    lots?: number,
-    adjustment?: number,
-    className?: string
+    figi: string;
+    placeholder?: number;
+    lots?: number;
+    adjustment?: number;
+    className?: string;
+    currency?: boolean;
+    color?: boolean
 }
 
-export function MarketInstrumentPrice({ figi, placeholder, lots = 1, adjustment = 0, className }: InstrumentPrice) {
+export function MarketInstrumentPrice({ figi, placeholder, lots = 1, adjustment = 0, className, currency = false, color = false }: InstrumentPrice) {
     const candle = useSuperCandle(figi)
     const { data: marketInstrument, error } = useMarketInstrument(figi)
     if (!candle || !marketInstrument || error) {
         if (placeholder != null) {
-            return <MarketInstrumentPriceWithCurrency figi={figi} price={placeholder} className={className} />
+            return <MarketInstrumentPriceWithCurrency
+                figi={figi}
+                color={color}
+                price={placeholder}
+                className={className} />
         }
         return null
     }
-    return <MarketInstrumentPriceWithCurrency figi={figi} price={(candle.c * lots) + adjustment} className={className}/>
+    return <MarketInstrumentPriceWithCurrency
+        figi={figi}
+        color={color}
+        price={(candle.c * lots) + adjustment}
+        change={candle.change}
+        className={className}
+        currency={currency} />
 }
 
 export function ColorPriceView({ candle }: { candle?: SuperCandle }) {
