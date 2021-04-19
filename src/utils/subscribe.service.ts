@@ -32,7 +32,7 @@ class SubscribeService {
         this.getAllRootSubscribers()
             .forEach(({ figi, interval }) => {
                 console.log(`Resubscribe ${figi} ${interval} after reconnect`)
-                socket.emit('subscribe', { figi, interval })
+                socket.emit('candle:subscribe', { figi, interval })
             })
     }
 
@@ -43,8 +43,8 @@ class SubscribeService {
         const is_first = this.getSubscribers({ figi, interval }).length === 1
 
         if (is_first) {
-            socket.emit('subscribe', { figi, interval })
-            socket.on(`TICKER:${figi}:${interval}`, this.broadcast({ figi, interval }))
+            socket.emit('candle:subscribe', { figi, interval })
+            socket.on(`candle:${figi}:${interval}`, this.broadcast({ figi, interval }))
         } else {
             const old_value = this.getOldValue({ figi, interval })
             if (typeof old_value !== 'undefined') {
@@ -61,8 +61,8 @@ class SubscribeService {
             const is_last = subscribers.length === 0
             //console.log(is_last, figi, interval, subscribers)
             if (is_last) {
-                socket.emit('unsubscribe', { figi, interval })
-                socket.off(`TICKER:${figi}:${interval}`, this.broadcast({ figi, interval }))
+                socket.emit('candle:unsubscribe', { figi, interval })
+                socket.off(`candle:${figi}:${interval}`, this.broadcast({ figi, interval }))
             }
         }
     }
