@@ -13,7 +13,7 @@ import { useStatistica } from "../../components/Statistic/Statistic"
 import useSuperCandle, { useStatefullSuperCandleHistory } from "../../components/Candle"
 import { defaultGetServerSideProps } from "../../utils"
 import { HOSTNAME } from "../../utils/env"
-import { TestOrderbook } from "../../components/OrderBook"
+import { OrderbookTable } from "../../components/Orderbook"
 
 export const getServerSideProps = defaultGetServerSideProps
 
@@ -114,7 +114,7 @@ function MarketInstrumentInfoView({ marketInstrument, onImportAllOrder, is_impor
         <Card className="mb-4">
           <Card.Body>
             <Card.Title>OrderBook</Card.Title>
-            <TestOrderbook figi={marketInstrument.figi} depth={3}/>
+            <OrderbookTable figi={marketInstrument.figi} depth={3}/>
           </Card.Body>
         </Card>
 

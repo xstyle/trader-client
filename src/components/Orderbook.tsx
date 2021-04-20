@@ -12,7 +12,7 @@ export function useOrderbook(figi: string, depth?: Depth) {
     return data
 }
 
-export function TestOrderbook(props: { figi: string, depth?: Depth }) {
+export function OrderbookTable(props: { figi: string, depth?: Depth }) {
     const orderbook = useOrderbook(props.figi, props.depth)
     if (!orderbook) return <div>Orderbook is loading...</div>
     const spread: number = orderbook?.asks[0][0] - orderbook?.bids[0][0]
