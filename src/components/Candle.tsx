@@ -1,9 +1,10 @@
-import { MarketInstrument } from "@tinkoff/invest-openapi-js-sdk/build/domain.d";
+import { Candle, CandleResolution, MarketInstrument } from "@tinkoff/invest-openapi-js-sdk/build/domain.d";
 import { useEffect, useState } from "react";
 import useSWR from "swr";
 import { CandlesIndex, SuperCandle } from "../types/CandleType";
 import { HOSTNAME } from '../utils/env';
 import { subscribeToCandle } from "../utils/candle";
+import { MarketInstrumentPriceWithCurrency } from "./Price";
 
 function number(new_value: SuperCandle, old_value: SuperCandle) {
     if (old_value.time === new_value.time) return new_value.v - old_value.v
@@ -68,7 +69,7 @@ export function useMarketInstruments({ figis }: { figis: string[] }) {
     return useSWR<MarketInstrument[]>(url.href, { initialData: !figis.length ? [] : undefined })
 }
 
-type MarketInstrumentsIndexType = {
+export type MarketInstrumentsIndex = {
     [id: string]: MarketInstrument | undefined
 }
 
@@ -77,7 +78,7 @@ export function useMarketInstrumentsIndex({ figis }: { figis: string[] }) {
     return (data || []).reduce((index, marketInstrument) => {
         index[marketInstrument.figi] = marketInstrument
         return index
-    }, {} as MarketInstrumentsIndexType)
+    }, {} as MarketInstrumentsIndex)
 }
 
 export function MarketInstrumentField({ figi, fieldName }: { readonly figi: string, readonly fieldName: keyof MarketInstrument }): JSX.Element {
@@ -96,7 +97,7 @@ export function MarketInstrumentAndCandleProvider({ figi, render, placeholder }:
 }
 
 
-export function useCandles(figis: string[] = []) {
+export function useCandles(figis: string[] = []): CandlesIndex {
     const [data, setData] = useState<CandlesIndex>({})
     useEffect(((data: CandlesIndex) => () => {
         const subscribers = figis.map((figi) => {
@@ -111,4 +112,20 @@ export function useCandles(figis: string[] = []) {
         }
     })(data), [JSON.stringify(figis)])
     return data
+}
+
+export function useHistoryPrice({ figi, date, interval }: { figi: string, date: string, interval: CandleResolution }): Candle | undefined {
+    const url = new URL(`/ticker/${figi}/price`, `http://${HOSTNAME}:3001`)
+    url.searchParams.set("date", date)
+    url.searchParams.set("interval", interval)
+    const { data } = useSWR(url.href)
+    if (!data) return
+    return data.data.candles[0]
+}
+
+export function HistoryPrice({ figi, date, interval }: { figi: string, date: string, interval: CandleResolution }) {
+    const candle = useHistoryPrice({ figi, date, interval })
+    console.log(candle)
+    if (!candle) return null
+    return <MarketInstrumentPriceWithCurrency figi={figi} price={candle.c} />
 }
