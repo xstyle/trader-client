@@ -2,7 +2,7 @@ import { Depth, OrderbookStreaming } from "../types/OrderbookType"
 
 import { socket } from "./io"
 
-export function subscribeToOrderBook({ figi, depth = 3 }: { figi: string, depth?: Depth }, cb: (x: OrderbookStreaming) => void) {
+export function subscribeToOrderBook({ figi, depth = 3 }: { figi: string, depth?: Depth }, cb: (x: OrderbookStreaming) => void): ()=> void {
     const event_name = `orderbook:${figi}:${depth}`
     const has_listeners = socket.hasListeners(event_name)
     socket.on(event_name, cb)

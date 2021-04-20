@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import useSWR from "swr";
 import { CandlesIndex, SuperCandle } from "../types/CandleType";
 import { HOSTNAME } from '../utils/env';
-import subscribeService from "../utils/subscribe.service";
+import { subscribeToCandle } from "../utils/candle";
 
 function number(new_value: SuperCandle, old_value: SuperCandle) {
     if (old_value.time === new_value.time) return new_value.v - old_value.v
@@ -13,23 +13,21 @@ function number(new_value: SuperCandle, old_value: SuperCandle) {
 export default function useSuperCandle(figi: string) {
     const [data, setData] = useState<SuperCandle>()
     useEffect(() => {
-        if (typeof figi === 'string') {
-            return subscribeService.subscribe({ figi }, (new_data, old_data) => {
-                const data: SuperCandle = { ...new_data }
-                if (old_data) {
-                    data.n = number(new_data, old_data)
-                    data.change = new_data.c - old_data.c
-                }
-                setData(data)
-            })
-        }
+        return subscribeToCandle({ figi, interval: "1min" }, (new_data, old_data) => {
+            const data: SuperCandle = { ...new_data }
+            if (old_data) {
+                data.n = number(new_data, old_data)
+                data.change = new_data.c - old_data.c
+            }
+            setData(data)
+        })
     }, [figi])
     return data
 }
 
 export function useStatefullSuperCandleHistory(figi: string, options = {}) {
     const [data, setData] = useState<SuperCandle[]>([])
-    useEffect(() => subscribeService.subscribe({ figi }, (new_data, old_data) => {
+    useEffect(() => subscribeToCandle({ figi, interval: "1min" }, (new_data, old_data) => {
         if (!old_data) return
         const _data: SuperCandle = { ...new_data }
         _data.n = number(new_data, old_data)
@@ -102,16 +100,15 @@ export function useCandles(figis: string[] = []) {
     const [data, setData] = useState<CandlesIndex>({})
     useEffect(((data: CandlesIndex) => () => {
         const subscribers = figis.map((figi) => {
-            //console.log(`${figi} has been subscribed`)
-            return subscribeService.subscribe({ figi }, (new_data) => {
-                data[figi] = new_data
+            return subscribeToCandle({ figi, interval: "1min" }, (x) => {
+                data[figi] = x
                 setData({ ...data })
             })
         })
         return () => {
-            //console.log(`All figis have been unsubscribed`)
+            console.log('unsubscribe')
             subscribers.map(subscriber => subscriber())
         }
-    })({}), [JSON.stringify(figis)])
+    })(data), [JSON.stringify(figis)])
     return data
 }

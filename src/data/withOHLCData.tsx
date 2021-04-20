@@ -4,7 +4,7 @@ import * as React from "react";
 import { IOHLCData } from "./iOHLCData";
 
 import { HOSTNAME } from "../utils/env"
-import subscribeService from "../utils/subscribe.service"
+import { subscribeToCandle } from "../utils/candle"
 import moment from "moment";
 import { CandleResolution } from "@tinkoff/invest-openapi-js-sdk/build/domain.d";
 
@@ -32,7 +32,7 @@ export function withOHLCData(dataSet = "DAILY") {
             }
             public subscribtion?: () => void
             subscribe() {
-                this.subscribtion = subscribeService.subscribe(this.props, (obj: { time: string, o: number, h: number, l: number, c: number, v: number }) => {
+                this.subscribtion = subscribeToCandle({figi: this.props.figi, interval: this.props.interval}, (obj: { time: string, o: number, h: number, l: number, c: number, v: number }) => {
                     const updated_item = driver(obj)
                     updated_item.date = moment(updated_item.date).toDate()
 
