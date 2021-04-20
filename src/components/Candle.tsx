@@ -1,9 +1,9 @@
-import { useEffect, useState } from "react"
+import { MarketInstrument } from "@tinkoff/invest-openapi-js-sdk/build/domain.d";
+import { useEffect, useState } from "react";
 import useSWR from "swr";
-import subscribeService from "../utils/subscribe.service"
-import { HOSTNAME } from '../utils/env'
-import { SuperCandle, CandlesIndex } from "../types/CandleType"
-import { MarketInstrument } from "@tinkoff/invest-openapi-js-sdk/build/domain.d"
+import { CandlesIndex, SuperCandle } from "../types/CandleType";
+import { HOSTNAME } from '../utils/env';
+import subscribeService from "../utils/subscribe.service";
 
 function number(new_value: SuperCandle, old_value: SuperCandle) {
     if (old_value.time === new_value.time) return new_value.v - old_value.v

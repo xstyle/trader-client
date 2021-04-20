@@ -46,8 +46,6 @@ export function withOHLCData(dataSet = "DAILY") {
 
                         this.setState({ data })
                     }
-                    console.log(this.props.figi)
-
                 })
             }
             unsubscribe() {
