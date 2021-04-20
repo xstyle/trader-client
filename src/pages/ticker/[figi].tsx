@@ -13,6 +13,7 @@ import { useStatistica } from "../../components/Statistic/Statistic"
 import useSuperCandle, { useStatefullSuperCandleHistory } from "../../components/Candle"
 import { defaultGetServerSideProps } from "../../utils"
 import { HOSTNAME } from "../../utils/env"
+import { TestOrderbook } from "../../components/OrderBook"
 
 export const getServerSideProps = defaultGetServerSideProps
 
@@ -57,7 +58,7 @@ function MarketInstrumentInfoView({ marketInstrument, onImportAllOrder, is_impor
   return <Container fluid>
     <h1>{marketInstrument.name}</h1>
     <Row>
-      <Col xl={3} lg={4} md={5} className="mb-3">
+      <Col xl={3} lg={4} md={5} >
         <p className="text-monospace display-3 text-center">
           <ColorPriceView candle={candle} />
         </p>
@@ -99,13 +100,21 @@ function MarketInstrumentInfoView({ marketInstrument, onImportAllOrder, is_impor
         </div>
         <Statistica figi={marketInstrument.figi} status={["Done", "New"]} />
       </Col>
-      <Col xl={9} lg={8} md={7} >
-        <Card>
+      <Col xl={7} lg={8} md={7} >
+        <Card className="mb-4">
           <Card.Body>
             <Chart
               figi={marketInstrument.figi}
               interval="1min"
               dateTimeFormat="%H:%M" />
+          </Card.Body>
+        </Card>
+      </Col>
+      <Col xl={2}>
+        <Card className="mb-4">
+          <Card.Body>
+            <Card.Title>OrderBook</Card.Title>
+            <TestOrderbook figi={marketInstrument.figi} depth={3}/>
           </Card.Body>
         </Card>
 
@@ -155,7 +164,7 @@ function OperationHistory({ figi }: { figi: string }) {
 const Statistica = ordersProvider((props: OrdersProviderInterface & OrdersSourceUrlProviderOptions & { figi: string }) => {
   const statistics = useStatistica(props.orders)
 
-  return <ListGroup>
+  return <ListGroup className="mb-4">
     <ListGroup.Item>Всего {statistics.lots}</ListGroup.Item>
     {!!statistics.lots && <ListGroup.Item>Средняя <MarketInstrumentPriceWithCurrency price={statistics.price_per_share} figi={props.figi} /></ListGroup.Item>}
     <ListGroup.Item>Бюджет <MarketInstrumentPriceWithCurrency price={statistics.budget} figi={props.figi} /></ListGroup.Item>
