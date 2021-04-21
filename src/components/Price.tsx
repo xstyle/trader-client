@@ -12,11 +12,10 @@ export default function Price({ suffix = "", price, as = "span", className = "" 
 
 
 export function MarketInstrumentPriceWithCurrency({ figi, price, className = "", currency = false, color = false, change = 0 }: { figi: string, price: number, className?: string, currency?: boolean, color?: boolean, change?: number }) {
-    const { data: marketInstrument, error } = useMarketInstrument(figi)
-    if (!marketInstrument || error) return <Price suffix="---" price={price} />
+    const { data: marketInstrument } = useMarketInstrument(figi)
     const classNameColor = !color ? "" : change === 0 ? "" : change > 0 ? "text-success" : "text-danger"
     return <Price
-        suffix={currency ? marketInstrument.currency : undefined}
+        suffix={currency ? marketInstrument?.currency ?? "---" : undefined}
         price={price}
         className={`${className} ${classNameColor}`} />
 }
