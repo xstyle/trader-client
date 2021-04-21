@@ -3,7 +3,7 @@ import moment from "moment"
 import { Card, Table } from "react-bootstrap"
 import { CandlesIndex } from "../types/CandleType"
 import { PortfolioProviderInterface } from "../types/PositioinType"
-import { HistoricalPrice, MarketInstrumentsIndex, PreviousDayPrice, PriceChange, useCandles, useMarketInstrumentsIndex } from './Candle'
+import { MarketInstrumentsIndex, PreviousDayPrice, PriceChange, useCandles, useMarketInstrumentsIndex, ValueChange } from './Candle'
 import { LinkToTickerPage } from "./Links"
 import { portfolioProvider } from "./Portfolio/PortfolioProvider"
 import Price from "./Price"
@@ -73,6 +73,7 @@ function PortfolioTableView({ positions, usd_candle, sum, candles_index, market_
                     <th className="text-right">Price</th>
                     <th className="text-right">Historical Price</th>
                     <th className="text-right">Change</th>
+                    <th className="text-right">Value Change</th>
                     <th>Name</th>
                     <th className="text-right">Balance</th>
                     <th className="text-right">Blocked</th>
@@ -105,8 +106,15 @@ function PortfolioTableView({ positions, usd_candle, sum, candles_index, market_
                                 </LinkToTickerPage>
                             </th>
                             <td className="text-right">{candle && <Price price={candle.c} />}</td>
-                            <td className="text-right"><PreviousDayPrice figi={position.figi} days_shift={-1} /></td>
-                            <td className="text-right"><PriceChange figi={position.figi} days_shift={-1} /></td>
+                            <td className="text-right">
+                                <PreviousDayPrice figi={position.figi} days_shift={-1} />
+                            </td>
+                            <td className="text-right">
+                                <PriceChange figi={position.figi} days_shift={-1} />
+                            </td>
+                            <td className="text-right">
+                                <ValueChange figi={position.figi} days_shift={-1} balance={position.balance} currency />
+                            </td>
                             <td>{position.name}</td>
                             <td className="text-monospace text-right">{position.balance.toFixed(2)}</td>
                             <td className="text-monospace text-right">{position.blocked}</td>

@@ -138,6 +138,15 @@ export function PriceChange({ figi, days_shift }: { figi: string, days_shift: nu
     return <Price price={change} suffix="%" className={className} />
 }
 
+export function ValueChange({ figi, days_shift, balance = 1, currency }: { figi: string, days_shift: number, balance?: number, currency?: boolean }) {
+    const previous_candle = usePreviousDayCandle({ figi, days_shift })
+    const candle = useSuperCandle(figi)
+    if (!previous_candle || !candle) return null
+    const value_change = (candle.c - previous_candle.c) * balance
+    const className = value_change < 0 ? `text-danger` : value_change > 0 ? 'text-success' : undefined
+    return <MarketInstrumentPriceWithCurrency figi={figi} price={value_change} className={className} currency={currency} />
+}
+
 export function PreviousDayPrice({ figi, days_shift }: { figi: string, days_shift: number }) {
     const candle = usePreviousDayCandle({ figi, days_shift })
     if (!candle) return null
