@@ -4,7 +4,7 @@ import useSWR from "swr";
 import { CandlesIndex, SuperCandle } from "../types/CandleType";
 import { HOSTNAME } from '../utils/env';
 import { subscribeToCandle } from "../utils/candle";
-import { MarketInstrumentPriceWithCurrency } from "./Price";
+import Price, { MarketInstrumentPriceWithCurrency } from "./Price";
 
 function number(new_value: SuperCandle, old_value: SuperCandle) {
     if (old_value.time === new_value.time) return new_value.v - old_value.v
@@ -123,9 +123,30 @@ export function useHistoryPrice({ figi, date, interval }: { figi: string, date: 
     return data.data.candles[0]
 }
 
-export function HistoryPrice({ figi, date, interval }: { figi: string, date: string, interval: CandleResolution }) {
+export function HistoricalPrice({ figi, date, interval }: { figi: string, date: string, interval: CandleResolution }) {
     const candle = useHistoryPrice({ figi, date, interval })
-    console.log(candle)
     if (!candle) return null
     return <MarketInstrumentPriceWithCurrency figi={figi} price={candle.c} />
+}
+
+export function PriceChange({ figi, days_shift }: { figi: string, days_shift: number }) {
+    const previous_day_candle = usePreviousDayCandle({ figi, days_shift })
+    const candle = useSuperCandle(figi)
+    if (!previous_day_candle || !candle) return null
+    const change = (candle.c / previous_day_candle.c * 100) - 100
+    const className = change < 0 ? `text-danger` : change > 0 ? 'text-success' : undefined
+    return <Price price={change} suffix="%" className={className} />
+}
+
+export function PreviousDayPrice({ figi, days_shift }: { figi: string, days_shift: number }) {
+    const candle = usePreviousDayCandle({ figi, days_shift })
+    if (!candle) return null
+    return <MarketInstrumentPriceWithCurrency figi={figi} price={candle.c} />
+}
+
+export function usePreviousDayCandle({ figi, days_shift }: { figi: string, days_shift: number }): Candle | undefined {
+    const url = new URL(`/ticker/${figi}/get_previous_candle`, `http://${HOSTNAME}:3001`)
+    url.searchParams.set("days_shift", days_shift.toString())
+    const { data } = useSWR(url.href)
+    return data?.candles[0]
 }
