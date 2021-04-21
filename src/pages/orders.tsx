@@ -1,6 +1,6 @@
 import Head from "next/head"
 import Link from "next/link"
-import { Button, Container, Table } from "react-bootstrap"
+import { Button, Card, Container, Table } from "react-bootstrap"
 import useSWR from "swr"
 import { defaultGetServerSideProps } from "../utils"
 import Header from "../components/Header"
@@ -80,42 +80,45 @@ const OrdersCtrl = <TProps extends OrdersProviderInterface>(Component: React.Com
 }
 
 const OrdersView = (props: OrdersProviderInterface & OrdersCtrlInterface) => (
-    <Table hover>
-        <thead>
-            <tr>
-                <th>Ticker</th>
-                <th>Operation</th>
-                <th>Lots</th>
-                <th>Executed</th>
-                <th>Price</th>
-                <th>Current Price</th>
-                <th>Id</th>
-                <th></th>
-            </tr>
-        </thead>
-        <tbody>
-            {
-                props.orders.map(order => (
-                    <tr key={order.orderId}>
-                        <td>
-                            <Link href={`/ticker/${order.figi}`}>
-                                <a><MarketInstrumentField figi={order.figi} fieldName={"ticker"} /></a>
-                            </Link>
-                        </td>
-                        <td>{order.operation}</td>
-                        <td>{order.requestedLots}</td>
-                        <td>{order.executedLots}</td>
-                        <td><MarketInstrumentPriceWithCurrency price={order.price} figi={order.figi} /></td>
-                        <td><MarketInstrumentPrice figi={order.figi} /></td>
-                        <td>{order.orderId}</td>
-                        <td>
-                            <Button onClick={() => props.onDecline(order)}>Decline</Button>
-                        </td>
-                    </tr>
-                ))
-            }
-        </tbody>
-    </Table>
+    <Card>
+        <Table hover responsive striped>
+            <thead>
+                <tr>
+                    <th>Ticker</th>
+                    <th>Operation</th>
+                    <th>Lots</th>
+                    <th>Executed</th>
+                    <th>Price</th>
+                    <th>Current Price</th>
+                    <th>Id</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                {
+                    props.orders.map(order => (
+                        <tr key={order.orderId}>
+                            <td>
+                                <Link href={`/ticker/${order.figi}`}>
+                                    <a><MarketInstrumentField figi={order.figi} fieldName={"ticker"} /></a>
+                                </Link>
+                            </td>
+                            <td>{order.operation}</td>
+                            <td>{order.requestedLots}</td>
+                            <td>{order.executedLots}</td>
+                            <td><MarketInstrumentPriceWithCurrency price={order.price} figi={order.figi} /></td>
+                            <td><MarketInstrumentPrice figi={order.figi} /></td>
+                            <td>{order.orderId}</td>
+                            <td>
+                                <Button onClick={() => props.onDecline(order)}>Decline</Button>
+                            </td>
+                        </tr>
+                    ))
+                }
+            </tbody>
+        </Table>
+    </Card>
+
 )
 
 const Orders = ordersProvider(OrdersCtrl(OrdersView))
