@@ -23,10 +23,6 @@ const pages: Page[] = [
         name: "Lists"
     },
     {
-        pathname: "/portfolio",
-        name: "Portfolio"
-    },
-    {
         pathname: "/orders",
         name: "Active orders"
     },
@@ -62,10 +58,10 @@ export default function Header() {
             }
         }
     })
-    function handleMouseEnter(page: Page) {
+    function handleMouseEnter(page: { pathname: string }) {
         setState(page.pathname)
     }
-    const handleMouseLeave = (page: Page) => () => {
+    const handleMouseLeave = (page: { pathname: string }) => () => {
         setState(pathname)
     }
     const go = (pathname: string) => () => {
@@ -77,7 +73,7 @@ export default function Header() {
         <Navbar.Toggle aria-controls="responsive-navbar-nav" />
         <Link href="/" passHref>
             <Navbar.Brand>Robots <Badge variant="success">{VERSION}</Badge></Navbar.Brand>
-        </Link>        
+        </Link>
         <Navbar.Collapse id="responsive-navbar-nav">
             <Nav className="mr-auto">
                 {
@@ -92,7 +88,17 @@ export default function Header() {
                 }
             </Nav>
         </Navbar.Collapse>
-        <Navbar.Text><PortfolioAmount /></Navbar.Text>
+        <Nav>
+            <Link href="/portfolio" passHref>
+                <Nav.Link
+                    active={pathname === "/portfolio"}
+                    onMouseEnter={() => handleMouseEnter({ pathname: "/portfolio" })}
+                    onMouseLeave={handleMouseLeave({ pathname: "/portfolio" })}>
+                    <PortfolioAmount />
+                </Nav.Link>
+            </Link>
+        </Nav>
+
     </Navbar>
 }
 
