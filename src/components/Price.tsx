@@ -6,7 +6,7 @@ export default function Price({ suffix = "", price, as = "span", className = "" 
         return null
     }
     const As = as as keyof JSX.IntrinsicElements
-    return <As className={`text-monospace ${className}`}>{price.toFixed(2)}{suffix ? " " + suffix : ""}</As>
+    return <As className={`text-monospace ${className}`}>{price.toFixed(2)}{suffix ? suffix : ""}</As>
 }
 
 

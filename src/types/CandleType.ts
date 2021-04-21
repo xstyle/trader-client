@@ -6,5 +6,5 @@ export type SuperCandle = Candle & {
 }
 
 export type CandlesIndex = {
-    [id: string]: Candle
+    [id: string]: Candle | undefined
 }
