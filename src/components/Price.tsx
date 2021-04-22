@@ -1,15 +1,13 @@
 import { SuperCandle } from "../types/CandleType"
 import useSuperCandle, { lastCandleProvider, useMarketInstrument } from "./Candle"
 
-export default function Price({ suffix = "", price, as = "span", className = "" }: { suffix?: string, price: number, as?: string, className?: string }): JSX.Element | null {
-    if (typeof price !== "number") {
-        return null
-    }
-    const As = as as keyof JSX.IntrinsicElements
-    return <As className={`text-monospace ${className}`}>{price.toFixed(2)}{suffix ? suffix : ""}</As>
+export default function Price({ suffix = "", price, as: As = "span", className = "" }: { suffix?: string, price: number, as?: keyof JSX.IntrinsicElements, className?: string }): JSX.Element | null {
+    if (typeof price !== "number") return null
+    return <As className={`text-monospace ${className}`}>
+        <span>{price.toFixed(2)}</span>
+        {suffix && <span className="pl-1">{suffix}</span>}
+    </As>
 }
-
-
 
 export function MarketInstrumentPriceWithCurrency({ figi, price, className = "", currency = false, color = false, change = 0 }: { figi: string, price: number, className?: string, currency?: boolean, color?: boolean, change?: number }) {
     const { data: marketInstrument } = useMarketInstrument(figi)

@@ -2,12 +2,13 @@ import Head from "next/head"
 import Link from "next/link"
 import React from "react"
 import { Button, Card, Container, ModalProps, Table } from "react-bootstrap"
-import { lastCandleProvider, LastCandleProviderInterface, MarketInstrumentField } from "../../components/Candle"
+import { MarketInstrumentField, PriceChange } from "../../components/Candle"
 import { withModal } from "../../components/ChartModal"
 import { DaggerCatcherCtrl, DaggerCatcherCtrlInterface } from "../../components/DaggerCatcher/DaggerCatcherController"
 import { daggerCatchersProvider } from "../../components/DaggerCatcher/DaggerCatcherProvider"
 import Header from "../../components/Header"
 import { TinLink } from "../../components/Links"
+import { MarketInstrumentPrice } from "../../components/Price"
 import { DaggerCatcherProviderInterface, DaggerCatchersProviderInterface } from "../../types/DaggerCatcherType"
 import { defaultGetServerSideProps } from "../../utils"
 
@@ -57,6 +58,7 @@ function View({ daggerCatchers, source_url }: DaggerCatchersProviderInterface) {
                         <th style={{ width: "1px" }}></th>
                         <th style={{ width: "1px" }}>Ticker</th>
                         <th style={{ width: "1px" }} className="text-right">Price</th>
+                        <th style={{ width: "1px" }} className="text-right">Price Change</th>
                         <th>App</th>
                         <th>Charts</th>
                         <th></th>
@@ -91,12 +93,15 @@ function TableRowView({ daggerCatcher, onSetPinned }: DaggerCatcherCtrlInterface
                 </a>
             </Link>
         </td>
-        <td className="text-monospace text-right">
+        <td className="text-right">
             <Link href={`/ticker/${daggerCatcher.figi}`}>
                 <a className="text-body">
-                    <ColorPrice figi={daggerCatcher.figi} />
+                    <MarketInstrumentPrice figi={daggerCatcher.figi} color currency/>
                 </a>
             </Link>
+        </td>
+        <td className="text-right">
+            <PriceChange figi={daggerCatcher.figi} days_shift={-1} />
         </td>
         <td>
             <TinLink figi={daggerCatcher.figi} />
@@ -115,12 +120,5 @@ function TableRowView({ daggerCatcher, onSetPinned }: DaggerCatcherCtrlInterface
         </td>
     </tr>
 }
-
-function ColorPriceView({ candle }: LastCandleProviderInterface) {
-    if (!candle) return null
-    return <span className={candle.change && (candle.change > 0) ? "text-success" : candle.change && (candle.change < 0) ? "text-danger" : ""}>{candle.c.toFixed(2)}</span>
-}
-
-const ColorPrice = lastCandleProvider(ColorPriceView)
 
 const ModalChart = withModal(({ onShow }: ModalProps) => (<Button variant="link" size="sm" onClick={onShow}>Chart</Button>))
