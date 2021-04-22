@@ -16,6 +16,7 @@ import { DaggerCatcherProviderInterface, DaggerCatchersProviderInterface } from 
 import { OrderType } from "../../types/OrderType";
 import { defaultGetServerSideProps } from "../../utils";
 import { DaggerCatcherCtrl, DaggerCatcherCtrlInterface } from '../../components/DaggerCatcher/DaggerCatcherController';
+import { OrderbookPositionPrice } from '../../components/Orderbook';
 
 export const getServerSideProps = defaultGetServerSideProps
 
@@ -135,9 +136,22 @@ function DaggerCatcherView({ daggerCatcher: catcher, onSubmit, state, onChange }
         </Breadcrumb>
         <Row>
             <Col sm="12" md="6">
-                <p className="text-monospace display-3 text-center">
-                    <MarketInstrumentPrice figi={catcher.figi} color />
-                </p>
+                <div className="d-flex flex-row">
+                    <div className="text-monospace display-3 text-center flex-fill">
+                        <MarketInstrumentPrice figi={catcher.figi} color />
+                    </div>
+                    <div className="d-flex align-items-center">
+                        <div>
+                            <div className="">
+                                <OrderbookPositionPrice figi={catcher.figi} type="asks"/>
+                            </div>
+                            <div className="">
+                                <OrderbookPositionPrice figi={catcher.figi} type="bids" />
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
                 {
                     candle && <>
                         <p className="text-monospace text-center">{candle.v.toFixed(0)} shares for <Moment durationFromNow interval={100}>{candle.time}</Moment></p>
