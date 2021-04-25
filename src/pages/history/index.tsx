@@ -35,14 +35,14 @@ const Histories = historiesProvider(HistoriesView)
 
 function HistoriesView({ histories }: HistoriesProviderInterface) {
     return <Card>
-        <Table hover size="sm" responsive>
+        <Table hover responsive>
             <thead>
                 <tr>
                     <th>Title</th>
                     <th>Ticker</th>
                     <th>Type</th>
                     <th>Created</th>
-                    <th></th>
+                    <th style={{ "width": "1px" }}></th>
                 </tr>
             </thead>
             <tbody>
@@ -70,8 +70,10 @@ function HistoriesView({ histories }: HistoriesProviderInterface) {
                             <td>
                                 <Link href={`/history/${history._id}/edit`} passHref>
                                     <Button
-                                        variant="outline-success"
-                                        size="sm">edit</Button>
+                                        variant="secondary"
+                                        size="sm">
+                                        <i className="fa fa-edit" />
+                                    </Button>
                                 </Link>
                             </td>
                         </tr>

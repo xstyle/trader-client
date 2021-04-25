@@ -5,6 +5,7 @@ import { CandlesIndex, SuperCandle } from "../types/CandleType";
 import { HOSTNAME } from '../utils/env';
 import { subscribeToCandle } from "../utils/candle";
 import Price, { MarketInstrumentPriceWithCurrency } from "./Price";
+import moment from "moment";
 
 function number(new_value: SuperCandle, old_value: SuperCandle) {
     if (old_value.time === new_value.time) return new_value.v - old_value.v
@@ -133,9 +134,14 @@ export function PriceChange({ figi, days_shift }: { figi: string, days_shift: nu
     const previous_day_candle = usePreviousDayCandle({ figi, days_shift })
     const candle = useSuperCandle(figi)
     if (!previous_day_candle || !candle) return null
-    const change = (candle.c / previous_day_candle.c * 100) - 100
-    const className = change < 0 ? `text-danger` : change > 0 ? 'text-success' : undefined
-    return <Price price={change} suffix="%" className={className} />
+    const price_change = (candle.c / previous_day_candle.c * 100) - 100
+    const className = price_change < 0 ? `text-danger` : price_change > 0 ? 'text-success' : undefined
+    const title = `Closing price ${moment(previous_day_candle.time).format("DD MMMM (dddd)")}: ${previous_day_candle.c}`
+    return <Price
+        price={price_change}
+        suffix="%"
+        className={className}
+        title={title} />
 }
 
 export function ValueChange({ figi, days_shift, balance = 1, currency }: { figi: string, days_shift: number, balance?: number, currency?: boolean }) {

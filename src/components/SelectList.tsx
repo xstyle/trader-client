@@ -3,6 +3,7 @@ import { Button, Modal, Table } from "react-bootstrap"
 import useSWR, { mutate } from "swr"
 import { ListsProviderInterface, ListType } from "../types/ListType"
 import { HOSTNAME } from '../utils/env'
+import { MarketInstrumentField } from "./Candle"
 import { listsProvider } from "./List/ListProvider"
 
 export const SelectList = listsProvider(SelectListCtrl(SelectListView))
@@ -15,7 +16,7 @@ function SelectListView({ show, figi, onClose, lists, onAdd, onRemove }: SelectL
             <Modal.Title>Select Lists</Modal.Title>
         </Modal.Header>
         <Modal.Body>
-            <p>Please choose list for {figi}</p>
+            <p>Please, choose Lists for <MarketInstrumentField figi={figi} fieldName="name"/></p>
         </Modal.Body>
         <Table
             hover
@@ -23,7 +24,7 @@ function SelectListView({ show, figi, onClose, lists, onAdd, onRemove }: SelectL
             <thead>
                 <tr>
                     <th>List name</th>
-                    <th></th>
+                    <th style={{width: "1px"}}></th>
                 </tr>
             </thead>
             <tbody>
@@ -32,7 +33,7 @@ function SelectListView({ show, figi, onClose, lists, onAdd, onRemove }: SelectL
                         const contains = list.figis.indexOf(figi) > -1
                         return <tr key={list._id}>
                             <th>{list.name}</th>
-                            <td>
+                            <td className="text-right">
                                 {contains
                                     ? <Button
                                         variant="danger"

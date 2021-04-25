@@ -1,9 +1,23 @@
 import { SuperCandle } from "../types/CandleType"
 import useSuperCandle, { lastCandleProvider, useMarketInstrument } from "./Candle"
 
-export default function Price({ suffix = "", price, as: As = "span", className = "" }: { suffix?: string, price: number, as?: keyof JSX.IntrinsicElements, className?: string }): JSX.Element | null {
+export default function Price({
+    suffix = "",
+    price,
+    as: As = "span",
+    className = "",
+    title
+}: {
+    suffix?: string,
+    price: number,
+    as?: keyof JSX.IntrinsicElements,
+    className?: string,
+    title?: string
+}): JSX.Element | null {
     if (typeof price !== "number") return null
-    return <As className={`text-monospace ${className}`}>
+    return <As
+        className={`text-monospace ${className}`}
+        title={title}>
         <span>{price.toFixed(2)}</span>
         {suffix && <span className="pl-1">{suffix}</span>}
     </As>
@@ -12,8 +26,16 @@ export default function Price({ suffix = "", price, as: As = "span", className =
 export function MarketInstrumentPriceWithCurrency({ figi, price, className = "", currency = false, color = false, change = 0 }: { figi: string, price: number, className?: string, currency?: boolean, color?: boolean, change?: number }) {
     const { data: marketInstrument } = useMarketInstrument(figi)
     const classNameColor = !color ? "" : change === 0 ? "" : change > 0 ? "text-success" : "text-danger"
+    let suffix = currency ? marketInstrument?.currency ?? "---" : undefined
+    switch (suffix) {
+        case "USD":
+            suffix = "$"
+            break;
+        default:
+            break;
+    }
     return <Price
-        suffix={currency ? marketInstrument?.currency ?? "---" : undefined}
+        suffix={suffix}
         price={price}
         className={`${className} ${classNameColor}`} />
 }

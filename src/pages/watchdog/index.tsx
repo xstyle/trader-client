@@ -38,14 +38,14 @@ const ContentLoader = watchdogsProvider(WatchdogsView)
 
 function WatchdogsView({ watchdogs, source_url }: WatchdogsProviderInterface) {
     return <Card>
-        <Table hover className="card-table" responsive size="sm">
+        <Table hover className="card-table" responsive>
             <thead>
                 <tr>
-                    <th>State</th>
-                    <th>Name</th>
+                    <th style={{ width: "1px" }}>State</th>
                     <th>Ticker</th>
                     <th className="text-right">Price</th>
                     <th>Treshold</th>
+                    <th style={{ width: "1px" }}></th>
                 </tr>
             </thead>
             <tbody>
@@ -70,15 +70,9 @@ function WatchdogView({ watchdog, onToogle }: WatchdogCtrlInterface & WatchdogPr
             <Button
                 variant={watchdog.is_enabled ? "success" : "danger"}
                 size="sm"
-                onClick={onToogle}>{watchdog.is_enabled ? 'On' : 'Off'}</Button></th>
-        <th>
-            <Link href={`/watchdog/${watchdog._id}`}>
-                <a>
-                    <MarketInstrumentField
-                        figi={watchdog.figi}
-                        fieldName="name" />
-                </a>
-            </Link>
+                onClick={onToogle}>
+                {watchdog.is_enabled ? 'On' : 'Off'}
+            </Button>
         </th>
         <td>
             <LinkToTickerPage figi={watchdog.figi}>
@@ -93,5 +87,12 @@ function WatchdogView({ watchdog, onToogle }: WatchdogCtrlInterface & WatchdogPr
             <MarketInstrumentPrice figi={watchdog.figi} />
         </td>
         <td>{watchdog.threshold}</td>
+        <td>
+            <Link href={`/watchdog/${watchdog._id}`}>
+                <Button variant="secondary">
+                    <i className="fa fa-edit" />
+                </Button>
+            </Link>
+        </td>
     </tr>
 }

@@ -124,10 +124,8 @@ function StocksTableView({ instruments, onAddTo }: StocksProviderInterface & Sto
             className="card-table"
             responsive
             hover
-            size="sm"
-            style={{ 'position': 'relative' }}>
-            <thead
-                style={{ 'position': 'sticky', 'top': 0 }}>
+            size="sm">
+            <thead>
                 <tr>
                     <th></th>
                     <th>Ticker</th>
@@ -146,7 +144,7 @@ function StocksTableView({ instruments, onAddTo }: StocksProviderInterface & Sto
                         <tr key={instrument.figi}>
                             <td>
                                 <Button
-                                    variant="outline-light"
+                                    variant="secondary"
                                     className="text-nowrap"
                                     size="sm"
                                     onClick={() => onAddTo(instrument.figi)}>Lists</Button>

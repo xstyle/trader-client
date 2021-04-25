@@ -43,7 +43,9 @@ function Body() {
                 passHref>
                 <Button
                     size="sm"
-                    variant="dark">Edit</Button>
+                    variant="secondary">
+                        <i className="fa fa-edit"/>
+                    </Button>
             </Link>
         </div>
         <History id={query.id as string} />

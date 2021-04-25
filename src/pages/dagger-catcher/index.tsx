@@ -57,11 +57,11 @@ function View({ daggerCatchers, source_url }: DaggerCatchersProviderInterface) {
                     <tr>
                         <th style={{ width: "1px" }}></th>
                         <th style={{ width: "1px" }}>Ticker</th>
-                        <th style={{ width: "1px" }} className="text-right">Price</th>
+                        <th style={{ width: "1px" }} className="text-right">Last Price</th>
                         <th style={{ width: "1px" }} className="text-right">Price Change</th>
-                        <th>App</th>
                         <th>Charts</th>
-                        <th></th>
+                        <th>App</th>
+                        <th style={{ "width": "1px" }}></th>
                     </tr>
                 </thead>
                 <tbody>
@@ -94,20 +94,16 @@ function TableRowView({ daggerCatcher, onSetPinned }: DaggerCatcherCtrlInterface
             </Link>
         </td>
         <td className="text-right">
-            <Link href={`/ticker/${daggerCatcher.figi}`}>
-                <a className="text-body">
-                    <MarketInstrumentPrice figi={daggerCatcher.figi} color currency/>
-                </a>
-            </Link>
+            <MarketInstrumentPrice figi={daggerCatcher.figi} color currency />
         </td>
         <td className="text-right">
             <PriceChange figi={daggerCatcher.figi} days_shift={-1} />
         </td>
         <td>
-            <TinLink figi={daggerCatcher.figi} />
+            <ModalChart figi={daggerCatcher.figi} />
         </td>
         <td>
-            <ModalChart figi={daggerCatcher.figi} />
+            <TinLink figi={daggerCatcher.figi} />
         </td>
         <td>
             <Link
@@ -121,4 +117,8 @@ function TableRowView({ daggerCatcher, onSetPinned }: DaggerCatcherCtrlInterface
     </tr>
 }
 
-const ModalChart = withModal(({ onShow }: ModalProps) => (<Button variant="link" size="sm" onClick={onShow}>Chart</Button>))
+const ModalChart = withModal(({ onShow }: ModalProps) => (
+    <Button variant="secondary" size="sm" onClick={onShow}>
+        <i className="fa fa-chart-line" />
+    </Button>
+))

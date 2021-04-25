@@ -82,14 +82,22 @@ export function SelectFigi({ onClose, onSelect, show }: ModalProps & { onSelect(
 const StocksList = stocksProdiver(StocksListView)
 
 function StocksListView({ instruments, onSelect }: StocksProviderInterface & StocksSourceUrlProvider & { onSelect(figi: string): void }) {
-    return <ListGroup>
+    function handleOnSelect(figi: string | null) {
+        figi && onSelect(figi)
+    }
+    return <ListGroup onSelect={handleOnSelect}>
         {
             instruments.map((instrument) =>
                 <ListGroup.Item
                     key={instrument.figi}
                     action
-                    as="button"
-                    onClick={() => onSelect(instrument.figi)}>{instrument.name}</ListGroup.Item>
+                    eventKey={instrument.figi}
+                    className="flex-column"
+                    as="button">
+                        <h5>{instrument.name}</h5>
+                        <small>{instrument.ticker}</small> <small className="text-muted">{instrument.type}</small> <small className="text-muted">{instrument.currency}</small>
+                     
+                </ListGroup.Item>
             )
         }
     </ListGroup>
