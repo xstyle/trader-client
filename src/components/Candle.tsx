@@ -108,7 +108,6 @@ export function useCandles(figis: string[] = []): CandlesIndex {
             })
         })
         return () => {
-            console.log('unsubscribe')
             subscribers.map(subscriber => subscriber())
         }
     })(data), [JSON.stringify(figis)])

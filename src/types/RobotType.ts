@@ -27,6 +27,7 @@ export type RobotType = NewRobotType & {
     start_shares_number: number
     is_removed: boolean
     lot: number
+    is_locked: boolean
 }
 
 export interface RobotsSourceUrlProviderInterface {

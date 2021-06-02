@@ -236,7 +236,8 @@ function RobotView({ robot, onEnable, onDisable }: RobotCtrlInterface & RobotPro
                 onClick={() => onEnable()}>Off</Button>}
         </td>
         <td>
-            {robot.stop_after_sell && <i className="fas fa-hand-paper text-success" />}
+            {robot.stop_after_sell ? <i className="fas fa-hand-paper text-success" title="Robot will be stopped after sell" /> : null}
+            {!robot.is_locked ? <i className="fas fa-lock text-danger" title="Robot is locked" /> : null}
         </td>
         <td className="text-right">
             <Price price={robot.budget} />
