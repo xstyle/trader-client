@@ -28,6 +28,7 @@ export type RobotType = NewRobotType & {
     is_removed: boolean
     lot: number
     is_locked: boolean
+    price_was_updated_at?: string
 }
 
 export interface RobotsSourceUrlProviderInterface {

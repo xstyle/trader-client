@@ -1,7 +1,8 @@
 import Link from "next/link"
 import { useRouter } from "next/router"
-import { CSSProperties } from "react"
+import React, { CSSProperties } from "react"
 import { Button, Col, Form, Row, Table } from "react-bootstrap"
+import Moment from "react-moment"
 import { mutate } from "swr"
 import { RobotProviderInterface, RobotsProviderInterface, RobotsSourceUrlProviderInterface, RobotType } from "../types/RobotType"
 import { HOSTNAME } from "../utils/env"
@@ -134,6 +135,7 @@ function RobotsTableView(props: RobotsProviderInterface & RobotsSourceUrlProvide
                     <th className="text-right">Interest</th>
                     {/* <th>Orders</th> */}
                     <th>Tags</th>
+                    <th>Price updated at</th>
                     <th style={WIDTH_1PX_STYLE}></th>
                 </tr>
             </thead>
@@ -237,7 +239,7 @@ function RobotView({ robot, onEnable, onDisable }: RobotCtrlInterface & RobotPro
         </td>
         <td>
             {robot.stop_after_sell ? <i className="fas fa-hand-paper text-success" title="Robot will be stopped after sell" /> : null}
-            {!robot.is_locked ? <i className="fas fa-lock text-danger" title="Robot is locked" /> : null}
+            {robot.is_locked ? <i className="fas fa-lock text-danger" title="Robot is locked" /> : null}
         </td>
         <td className="text-right">
             <Price price={robot.budget} />
@@ -266,6 +268,13 @@ function RobotView({ robot, onEnable, onDisable }: RobotCtrlInterface & RobotPro
                         <a>#{tag}</a>
                     </Link>
                 )
+            }
+        </td>
+        <td>
+            {
+                robot.price_was_updated_at ?
+                    <Moment fromNow date={robot.price_was_updated_at} withTitle titleFormat="D MMM YYYY HH:mm:ss" /> :
+                    null
             }
         </td>
         <td className="text-nowrap">
