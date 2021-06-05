@@ -1,6 +1,5 @@
 import Link from 'next/link'
 import { useRouter } from 'next/router'
-import { useEffect, useState } from 'react'
 import { Badge, Nav, Navbar } from 'react-bootstrap'
 import { VERSION } from '../utils/env'
 import { PortfolioAmount } from "./Portfolio"
@@ -45,60 +44,38 @@ const pages: Page[] = [
 ]
 
 export default function Header() {
-    const router = useRouter()
-    const { pathname } = router
-    const [state, setState] = useState<string>()
-    useEffect(() => {
-        if (state) {
-            if (state != pathname) {
-                const timeoutid = setTimeout(go(state), 300)
-                return () => {
-                    clearTimeout(timeoutid)
-                }
-            }
-        }
-    })
-    function handleMouseEnter(page: { pathname: string }) {
-        setState(page.pathname)
-    }
-    const handleMouseLeave = (page: { pathname: string }) => () => {
-        setState(pathname)
-    }
-    const go = (pathname: string) => () => {
-        console.log('go triggered', pathname)
-        router.push(pathname)
-    }
+    const { pathname } = useRouter()
 
     return <Navbar bg="primary" variant="dark" expand="lg" >
         <Navbar.Toggle aria-controls="responsive-navbar-nav" />
-        <Link href="/" passHref>
+        <Link
+            href="/"
+            passHref>
             <Navbar.Brand>Robots <Badge variant="success">{VERSION}</Badge></Navbar.Brand>
         </Link>
         <Navbar.Collapse id="responsive-navbar-nav">
             <Nav className="mr-auto">
                 {
                     pages.map(page => (
-                        <Link href={page.pathname} passHref key={page.pathname}>
-                            <Nav.Link
-                                active={pathname === page.pathname}
-                                onMouseEnter={() => handleMouseEnter(page)}
-                                onMouseLeave={handleMouseLeave(page)}>{page.name}</Nav.Link>
+                        <Link
+                            key={page.pathname}
+                            href={page.pathname}
+                            passHref>
+                            <Nav.Link active={pathname === page.pathname}>{page.name}</Nav.Link>
                         </Link>
                     ))
                 }
             </Nav>
         </Navbar.Collapse>
         <Nav>
-            <Link href="/portfolio" passHref>
-                <Nav.Link
-                    active={pathname === "/portfolio"}
-                    onMouseEnter={() => handleMouseEnter({ pathname: "/portfolio" })}
-                    onMouseLeave={handleMouseLeave({ pathname: "/portfolio" })}>
+            <Link
+                href="/portfolio"
+                passHref>
+                <Nav.Link active={pathname === "/portfolio"}>
                     <PortfolioAmount />
                 </Nav.Link>
             </Link>
         </Nav>
-
     </Navbar>
 }
 
