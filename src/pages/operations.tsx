@@ -1,17 +1,18 @@
+import { OperationType, OperationTypeWithCommission } from "@tinkoff/invest-openapi-js-sdk/build/domain.d"
+import Head from "next/head"
 import Link from "next/link"
 import { useRouter } from "next/router"
 import React, { useState } from "react"
-import { Badge, Button, ButtonGroup, ButtonToolbar, Card, Container, Form, Table } from "react-bootstrap"
+import { Badge, Button, ButtonToolbar, Card, Container, Form, Table } from "react-bootstrap"
 import ReactDatePicker from "react-datepicker"
+import "react-datepicker/dist/react-datepicker.css"
 import Moment from "react-moment"
+import { MarketInstrumentField } from "../components/Candle"
 import Header from "../components/Header"
 import { operationsProvider } from "../components/Operation/OperationProvider"
-import { MarketInstrumentField } from "../components/Candle"
+import { MultiSelectButtonGroupView } from "../components/SelectGroupButton"
 import { OperationsProviderInterface, OperationsSourceUrlProviderInterface, OperationStatus } from "../types/OperationType"
 import { defaultGetServerSideProps } from "../utils"
-import { OperationType, OperationTypeWithCommission } from "@tinkoff/invest-openapi-js-sdk/build/domain.d"
-import "react-datepicker/dist/react-datepicker.css"
-import Head from "next/head"
 
 export const getServerSideProps = defaultGetServerSideProps
 
@@ -134,35 +135,18 @@ function LayoutView(props: LayoutCtrlInterface & DateRange) {
                 inline
             />
         </Form.Group>
-        <Form.Group>
-            <ButtonToolbar>
-                <ButtonGroup className="mr-2">
-                    {
-                        defaultStatuses.map(status => (
-                            <Button
-                                key={status}
-                                onClick={() => props.onToogleStatus(status)}
-                                active={props.status.indexOf(status) > -1}>{status}</Button>
-                        ))
-                    }
-                </ButtonGroup>
-                <ButtonGroup className="mr-4">
-                    <Button onClick={props.onClearStatus}>All</Button>
-                </ButtonGroup>
-                <ButtonGroup>
-                    {
-                        defaultTypes.map(type => (
-                            <Button
-                                key={type}
-                                onClick={() => props.onToogleOperationType(type)}
-                                active={props.types.indexOf(type) > -1}>{type}</Button>
-                        ))
-                    }
-                </ButtonGroup>
+        <ButtonToolbar>
+            <MultiSelectButtonGroupView
+                options={defaultStatuses.map(status => ({ name: status, value: status }))}
+                values={props.status}
+                onSelect={props.onToogleStatus} />
 
-            </ButtonToolbar>
-
-        </Form.Group>
+            <Button className="ml-3 mr-3 mb-3" size="sm" onClick={props.onClearStatus}>All</Button>
+            <MultiSelectButtonGroupView
+                options={defaultTypes.map(type => ({ name: type, value: type }))}
+                values={props.types}
+                onSelect={props.onToogleOperationType} />
+        </ButtonToolbar>
         {props.start_date && props.end_date && <Operations
             {...props}
             start_date={props.start_date.toISOString()}
@@ -175,22 +159,24 @@ const Operations = operationsProvider(OperationsView)
 function OperationsView(props: OperationsProviderInterface & OperationsSourceUrlProviderInterface & LayoutCtrlInterface) {
     const { figi } = props
     return <>
-        {figi && <Form.Group>
-            <Link
-                passHref
-                href={{
-                    pathname: "/operations",
-                    query: {}
-                }}>
-                <Badge
-                    variant="primary"
-                    as="a">
-                    <MarketInstrumentField
-                        figi={figi}
-                        fieldName="name" /> <span aria-hidden="true">&times;</span>
-                </Badge>
-            </Link>
-        </Form.Group>}
+        {
+            figi ?
+                <Form.Group>
+                    <Link
+                        passHref
+                        href={{
+                            pathname: "/operations",
+                            query: {}
+                        }}>
+                        <Badge variant="primary">
+                            <MarketInstrumentField
+                                figi={figi}
+                                fieldName="name" /> <span aria-hidden="true">&times;</span>
+                        </Badge>
+                    </Link>
+                </Form.Group> :
+                null
+        }
         <Card>
             <OperationTableView {...props} />
         </Card>
@@ -226,16 +212,19 @@ function OperationTableView({ operations, figi, onSetEnd, onSetStart }: Operatio
                         <th>{operations.length - index}</th>
                         <td>{item.operationType}</td>
                         <td>
-                            {item.figi && <Link
-                                href={{
-                                    pathname: "/operations",
-                                    query: {
-                                        ...query,
-                                        figi: item.figi
-                                    }
-                                }}>
-                                <a><MarketInstrumentField figi={item.figi} fieldName="ticker" /></a>
-                            </Link>}
+                            {
+                                item.figi ? <Link
+                                    href={{
+                                        pathname: "/operations",
+                                        query: {
+                                            ...query,
+                                            figi: item.figi
+                                        }
+                                    }}>
+                                    <a><MarketInstrumentField figi={item.figi} fieldName="ticker" /></a>
+                                </Link> :
+                                    null
+                            }
                         </td>
                         <td>{item.status}</td>
                         <td>
@@ -245,9 +234,7 @@ function OperationTableView({ operations, figi, onSetEnd, onSetStart }: Operatio
                                 titleFormat="DD/MM/YYYY  HH:mm:ss">{item.date}</Moment>
                         </td>
                         <td>
-                            <Button onClick={() => onSetStart(item.date)}>start</Button>
-                            &nbsp;
-                            <Button onClick={() => onSetEnd(item.date)}>end</Button>
+                            <Button onClick={() => onSetStart(item.date)}>start</Button> <Button onClick={() => onSetEnd(item.date)}>end</Button>
                         </td>
                         <td>{item.quantity}</td>
                         <td><b>{item.quantityExecuted}</b></td>
