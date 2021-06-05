@@ -114,7 +114,7 @@ function MarketInstrumentInfoView({ marketInstrument, onImportAllOrder, is_impor
         <Card className="mb-4">
           <Card.Body>
             <Card.Title>OrderBook</Card.Title>
-            <OrderbookTable figi={marketInstrument.figi} depth={3}/>
+            <OrderbookTable figi={marketInstrument.figi} depth={3} />
           </Card.Body>
         </Card>
 
@@ -163,11 +163,13 @@ function OperationHistory({ figi }: { figi: string }) {
 
 const Statistica = ordersProvider((props: OrdersProviderInterface & OrdersSourceUrlProviderOptions & { figi: string }) => {
   const statistics = useStatistica(props.orders)
+  const candle = useSuperCandle(props.figi)
 
   return <ListGroup className="mb-4">
-    <ListGroup.Item>Всего {statistics.lots}</ListGroup.Item>
-    {!!statistics.lots && <ListGroup.Item>Средняя <MarketInstrumentPriceWithCurrency price={statistics.price_per_share} figi={props.figi} /></ListGroup.Item>}
-    <ListGroup.Item>Бюджет <MarketInstrumentPriceWithCurrency price={statistics.budget} figi={props.figi} /></ListGroup.Item>
-    <ListGroup.Item>Доход <MarketInstrumentPrice figi={props.figi} lots={statistics.lots} adjustment={statistics.budget} /></ListGroup.Item>
+    <ListGroup.Item>Всего лотов {statistics.lots}</ListGroup.Item>
+    <ListGroup.Item>Бюджет <MarketInstrumentPriceWithCurrency price={statistics.budget} figi={props.figi} currency /></ListGroup.Item>
+    {!!statistics.lots ? <ListGroup.Item>Средняя <MarketInstrumentPriceWithCurrency price={statistics.price_per_share} figi={props.figi} currency /></ListGroup.Item> : null}
+    <ListGroup.Item>Стоимость <MarketInstrumentPriceWithCurrency price={statistics.lots * (candle?.c ?? 0)} figi={props.figi} currency /></ListGroup.Item>
+    <ListGroup.Item>Доход <MarketInstrumentPrice figi={props.figi} lots={statistics.lots} adjustment={statistics.budget} currency /></ListGroup.Item>
   </ListGroup>
 })
