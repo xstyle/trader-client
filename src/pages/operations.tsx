@@ -58,8 +58,8 @@ function LayoutCtrl<TProps extends {}>(Component: React.ComponentType<TProps & L
             status: ["Done"],
             types: ["Buy", "Sell"]
         })
-
-        function handleDateRangeChange([start_date, end_date]: Date[]) {
+Date
+        function handleDateRangeChange([start_date, end_date]: [Date, Date?]) {
             start_date.setHours(0, 0, 0, 0)
             end_date && end_date.setHours(23, 59, 59, 999)
             setState({

@@ -1,4 +1,4 @@
-import { OrderStatus } from "@tinkoff/invest-openapi-js-sdk/build/domain"
+import { OrderStatus } from "@tinkoff/invest-openapi-js-sdk/build/domain.d"
 import moment from "moment"
 import Head from "next/head"
 import React, { useState } from "react"

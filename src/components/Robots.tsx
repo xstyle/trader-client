@@ -36,17 +36,21 @@ const footer_style: CSSProperties = {
 
 function RobotsList(props: RobotsProviderInterface & RobotsSourceUrlProviderInterface) {
     const robotsGroups = Object.values(props.robots.reduce<{ [id: string]: RobotType[] }>((index, robot) => {
-        if (!index[robot.figi]) index[robot.figi] = []
-        index[robot.figi].push(robot)
+        const robotGroup = index[robot.figi] ?? (index[robot.figi] = [])
+        robotGroup.push(robot)
         return index
     }, {}))
     return <>
         {
-            robotsGroups.map((robotsGroup) => <RobotsGroupView
-                {...props}
-                robots={robotsGroup}
-                key={robotsGroup[0].figi}
-                figi={robotsGroup[0].figi} />)
+            robotsGroups.map((robotsGroup) => {
+                const robot = robotsGroup[0]
+                if (!robot) throw new Error('robot not found')
+                return <RobotsGroupView
+                    {...props}
+                    robots={robotsGroup}
+                    key={robot.figi}
+                    figi={robot.figi} />
+            })
         }
     </>
 }

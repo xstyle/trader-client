@@ -22,15 +22,15 @@ export function subscribeToCandle({ figi, interval = '1min' }: Subscriber, cb: (
 }
 
 const old_candles_index: {
-    [id: string]: [Candle, Candle]
+    [id: string]: [Candle, Candle | undefined]
 } = {}
 
-function setOldCandle(name: string, x: Candle): [Candle, Candle] | undefined {
+function setOldCandle(name: string, x: Candle): [Candle, Candle | undefined] | undefined {
     const tmp = old_candles_index[name]
     return old_candles_index[name] = [x, tmp?.[0]]
 }
 
-function getOldCandle(name: string): [Candle, Candle] | undefined {
+function getOldCandle(name: string): [Candle, Candle?] | undefined {
     return old_candles_index[name]
 }
 interface Subscriber {

@@ -41,11 +41,11 @@ function ReportsCtrl<TProps extends {}>(Component: React.ComponentType<TProps & 
 
         const days: ReportDay[] = []
         // step 0
-        const first_date = moment(orders[orders.length - 1].createdAt)
+        const first_date = moment(orders[orders.length - 1]?.createdAt)
         first_date.startOf('d')
 
         const amount = sumAmount(orders)
-        const last_date = amount ? moment() : moment(orders[0].createdAt)
+        const last_date = amount ? moment() : moment(orders[0]?.createdAt)
         last_date.endOf('d')
 
         // step 1
@@ -67,13 +67,14 @@ function ReportsCtrl<TProps extends {}>(Component: React.ComponentType<TProps & 
         // step 2
         const operations_index = orders.reduce((index, order) => {
             const formatted_date = moment(order.createdAt).format('YYYY.MM.DD')
-            if (!index[formatted_date]) index[formatted_date] = []
-            index[formatted_date].push(order)
+            const day = index[formatted_date] ?? (index[formatted_date] = [])
+            day.push(order)
             return index
         }, {} as { [id: string]: OrderType[] })
         days.forEach(day => {
             const formatted_date = moment(day.date).format('YYYY.MM.DD')
-            if (operations_index[formatted_date]) day.operations = operations_index[formatted_date]
+            const operations = operations_index[formatted_date]
+            if (operations) day.operations = operations
         })
         //step 3
         days.forEach(day => {
@@ -81,7 +82,7 @@ function ReportsCtrl<TProps extends {}>(Component: React.ComponentType<TProps & 
         })
         // step 4
         days.forEach((day, index, array) => {
-            day.amount = day.change + (index ? array[index - 1].amount : 0)
+            day.amount = day.change + (array[index - 1]?.amount ?? 0)
         })
 
         // step 5
@@ -94,7 +95,7 @@ function ReportsCtrl<TProps extends {}>(Component: React.ComponentType<TProps & 
 
         // step 6
         days.forEach((day, index, array) => {
-            day.payment_amount = day.payment + (index ? array[index - 1].payment_amount : 0)
+            day.payment_amount = day.payment + (array[index - 1]?.payment_amount ?? 0)
         })
 
         // step 7

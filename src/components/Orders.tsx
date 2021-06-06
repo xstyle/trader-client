@@ -159,10 +159,12 @@ export const OrdersCtrl = <TProps extends OrdersProviderInterface & OrdersSource
     async function handleSync(order: OrderType) {
         const data = [...orders]
         const index = orders.indexOf(order)
-        data[index] = { ...orders[index], isSyncing: true }
-        mutate(source_url, data, false)
-        await fetch(`http://${HOSTNAME}:3001/order/${order._id}/sync`)
-        mutate(source_url)
+        if (index > -1) {
+            data[index] = { ...order, isSyncing: true }
+            mutate(source_url, data, false)
+            await fetch(`http://${HOSTNAME}:3001/order/${order._id}/sync`)
+            mutate(source_url)
+        }
     }
 
     function toogleShow() {
@@ -187,15 +189,18 @@ export const OrdersCtrl = <TProps extends OrdersProviderInterface & OrdersSource
     async function handleCancel(order: OrderType) {
         const data = [...orders]
         const index = orders.indexOf(order)
-        data[index] = { ...orders[index], isCanceling: true }
-        mutate(source_url, data, false)
-        await fetch(`http://${HOSTNAME}:3001/order/${order._id}/cancel`)
-        mutate(source_url)
+        if (index > -1) {
+            data[index] = { ...order, isCanceling: true }
+            mutate(source_url, data, false)
+            await fetch(`http://${HOSTNAME}:3001/order/${order._id}/cancel`)
+            mutate(source_url)
+        }
     }
 
     function handleShowAll() {
         setLimit(orders.length)
     }
+
     const exclude = orders.map(order => order.orderId)
 
     return <>
@@ -423,7 +428,7 @@ function OrderInfoView({ order, onSync, onCancel }: OrderInfoInterface) {
                     <th>Date</th>
                     <th>Trade ID</th>
                 </tr>
-            </thead> 
+            </thead>
             <tbody>
                 {
                     order.trades && order.trades.map(trade =>

@@ -22,7 +22,10 @@ export function OrderbookPositionPrice({ figi, depth = 1, type }: { figi: string
 export function OrderbookTable(props: { figi: string, depth?: Depth }) {
     const orderbook = useOrderbook(props.figi, props.depth)
     if (!orderbook) return <div>Orderbook is loading...</div>
-    const spread: number = orderbook?.asks[0][0] - orderbook?.bids[0][0]
+    const ask = orderbook?.asks[0]
+    const bid = orderbook?.bids[0]
+    if (!ask || !bid) return <div>Empty orderbook</div> 
+    const spread: number = ask[0] - bid[0]
     return <Table size="sm" hover>
         <thead>
             <tr>
