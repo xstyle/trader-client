@@ -1,3 +1,4 @@
+import { useFormik } from "formik"
 import Head from "next/head"
 import Link from "next/link"
 import { useRouter } from "next/router"
@@ -7,7 +8,6 @@ import Header from '../../components/Header'
 import { SelectFigiInput } from "../../components/SelectFigi"
 import { NewRobotType } from "../../types/RobotType"
 import { defaultGetServerSideProps } from "../../utils"
-import { applyChangeToData, getValueFromInput } from "../../utils/defaultTypePath"
 import { HOSTNAME } from "../../utils/env"
 
 export const getServerSideProps = defaultGetServerSideProps
@@ -51,45 +51,38 @@ function InstrumentCtrl<TProps extends {}>(Component: React.ComponentType<TProps
     return (props) => {
         const router = useRouter()
         const { ticker, buy_price, name, figi } = router.query
-        const [robot, setRobot] = useState<NewRobotType>({
-            figi: !figi ? "" : Array.isArray(figi) ? "" : figi,
-            name: !name ? "" : Array.isArray(name) ? "" : name,
-            buy_price: !buy_price ? 0 : Array.isArray(buy_price) ? 0 : parseFloat(buy_price) == NaN ? 0 : parseFloat(buy_price),
-            sell_price: !buy_price ? 0 : Array.isArray(buy_price) ? 0 : parseFloat(buy_price) == NaN ? 0 : parseFloat(buy_price),
-            max_shares_number: 1,
-            min_shares_number: 0,
-            initial_max_shares_number: 1,
-            initial_min_shares_number: 0,
-            budget: 0,
-            strategy: ''
+
+        const { values: robot, handleSubmit, handleChange, isSubmitting } = useFormik<NewRobotType>({
+            initialValues: {
+                figi: !figi ? "" : Array.isArray(figi) ? "" : figi,
+                name: !name ? "" : Array.isArray(name) ? "" : name,
+                buy_price: !buy_price ? 0 : Array.isArray(buy_price) ? 0 : parseFloat(buy_price) == NaN ? 0 : parseFloat(buy_price),
+                sell_price: !buy_price ? 0 : Array.isArray(buy_price) ? 0 : parseFloat(buy_price) == NaN ? 0 : parseFloat(buy_price),
+                max_shares_number: 1,
+                min_shares_number: 0,
+                initial_max_shares_number: 1,
+                initial_min_shares_number: 0,
+                budget: 0,
+                strategy: ''
+            },
+            onSubmit: async function (values) {
+                const response = await fetch(`http://${HOSTNAME}:3001/robot`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(values)
+                })
+                const data = await response.json()
+                router.replace(`/robot/${data._id}/edit`)
+            }
         })
-        const [is_saving, setSaving] = useState(false)
-
-        async function handleSubmit(event: FormEvent<HTMLFormElement>) {
-            setSaving(true)
-            event.preventDefault()
-            const response = await fetch(`http://${HOSTNAME}:3001/robot`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(robot)
-            })
-            const data = await response.json()
-            router.replace(`/robot/${data._id}/edit`)
-        }
-
-        function handleChange({ target }: ChangeEvent<HTMLInputElement>) {
-            const { name } = target
-            const value = getValueFromInput(target)
-            setRobot(applyChangeToData(robot, name, value))
-        }
         const is_valid = true
         return <Component
             {...props}
             robot={robot}
             is_valid={is_valid}
-            is_saving={is_saving}
+            is_saving={isSubmitting}
             onChange={handleChange}
             onSubmit={handleSubmit} />
     }

@@ -1,3 +1,4 @@
+import { useFormik } from "formik"
 import Head from "next/head"
 import Link from "next/link"
 import React, { ChangeEventHandler, MouseEventHandler, useState } from "react"
@@ -9,7 +10,6 @@ import { SelectList } from "../components/SelectList"
 import { stocksProdiver } from "../components/Stock/StockProvider"
 import { StocksProviderInterface } from "../types/StockType"
 import { defaultGetServerSideProps } from "../utils"
-import { getValueFromInput } from "../utils/defaultTypePath"
 import { HOSTNAME } from '../utils/env'
 
 export const getServerSideProps = defaultGetServerSideProps
@@ -42,12 +42,12 @@ interface StocksCtrlInterface {
 
 function StocksCtrl<TProps extends {}>(Component: React.ComponentType<TProps & StocksCtrlInterface>): React.FC<TProps> {
     return (props) => {
-        const [search, setSeach] = useState('')
         const [is_updating, setUpdating] = useState(false)
-        const handleChange: ChangeEventHandler<HTMLInputElement> = ({ target }) => {
-            const value = getValueFromInput(target)
-            setSeach(value)
-        }
+        const { values: { search }, handleChange } = useFormik({
+            initialValues: { search: '' },
+            onSubmit: () => { }
+        })
+
         async function handleUpdateDb() {
             setUpdating(true)
             await fetch(`http://${HOSTNAME}:3001/ticker/updatedb`)

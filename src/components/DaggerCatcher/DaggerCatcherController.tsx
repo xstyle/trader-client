@@ -1,7 +1,7 @@
-import { ChangeEventHandler, ComponentType, FC, useEffect, useState } from "react"
+import { useFormik } from "formik"
+import { ChangeEventHandler, ComponentType, FC, useEffect } from "react"
 import { mutate } from "swr"
 import { DaggerCatcherProviderInterface } from "../../types/DaggerCatcherType"
-import { getValueFromInput } from "../../utils/defaultTypePath"
 import { HOSTNAME } from "../../utils/env"
 import { MutateOrders } from "../Orders"
 
@@ -28,24 +28,20 @@ export function DaggerCatcherCtrl<TProps extends DaggerCatcherProviderInterface>
             lots: 1,
         };
 
-        const [state, setState] = useState(initialState)
-
         useEffect(() => {
-            setState(initialState)
+            formik.setValues(initialState)
         }, [props.daggerCatcher])
 
-        const handleChange: ChangeEventHandler<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement> = (event) => {
-            const { target } = event
-            const { name } = target
-            const value = getValueFromInput(target)
-            setState({ ...state, [name]: value })
-        }
+        const formik = useFormik({
+            initialValues: initialState,
+            onSubmit: () => {}
+        })
 
         async function handleSubmit(operation: "Sell" | "Buy") {
             try {
                 await fetch(`${props.source_url}/order`, {
                     method: 'POST',
-                    body: JSON.stringify({ ...state, operation }),
+                    body: JSON.stringify({ ...formik.values, operation }),
                     headers: {
                         'Content-Type': 'application/json'
                     }
@@ -66,9 +62,9 @@ export function DaggerCatcherCtrl<TProps extends DaggerCatcherProviderInterface>
 
         return <Component
             {...props}
-            state={state}
+            state={formik.values}
             onSubmit={handleSubmit}
-            onChange={handleChange}
+            onChange={formik.handleChange}
             // candle={candle}
             // marketInstrument={marketInstrument}
             onSetPinned={handleSetPinned} />

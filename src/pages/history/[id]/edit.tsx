@@ -1,3 +1,4 @@
+import { useFormik } from "formik";
 import Head from "next/head";
 import Link from "next/link";
 import { useRouter } from "next/router";
@@ -8,7 +9,6 @@ import Header from "../../../components/Header";
 import { historyProvider } from "../../../components/History/HistoryProvider";
 import { HistoryProviderInterface } from "../../../types/HistoryType";
 import { defaultGetServerSideProps } from "../../../utils";
-import { applyChangeToData, getValueFromInput } from "../../../utils/defaultTypePath";
 import { HOSTNAME } from "../../../utils/env"
 
 export const getServerSideProps = defaultGetServerSideProps
@@ -56,40 +56,32 @@ interface HistoryEditorCtrlInterface {
 
 function HistoryEditorCtrl<TProps extends HistoryProviderInterface>(Component: React.ComponentType<TProps & HistoryEditorCtrlInterface>): React.FC<TProps> {
     return (props) => {
-        const { source_url } = props
-        const [history, setHistory] = useState(props.history)
-        useEffect(() => setHistory(props.history), [props.history])
+        const formik = useFormik({
+            initialValues: props.history,
+            onSubmit: async (values) => {
 
-        function handleChange(event: ChangeEvent<HTMLInputElement>) {
-            const { target } = event
-            const { name } = target
-            const value = getValueFromInput(target)
-            setHistory(applyChangeToData(props.history, name, value))
-        }
+                await fetch(`http://${HOSTNAME}:3001/history/${values._id}`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(values)
+                })
+                mutate(props.source_url)
+            }
+        })
 
-        async function handleSubmit(event: FormEvent<HTMLFormElement>) {
-            event.preventDefault()
-            setSaving(true)
-            await fetch(`http://${HOSTNAME}:3001/history/${history._id}`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(history)
-            })
-            mutate(source_url)
-            setSaving(false)
-        }
+        useEffect(() => { formik.setValues(props.history) }, [props.history])
 
-        const [is_saving, setSaving] = useState(false)
-        const is_valid = !!history.title && !!history.figi
+        const is_valid = !!formik.values.title && !!formik.values.figi
+
         return <Component
             {...props}
-            history={history}
-            is_saving={is_saving}
+            history={formik.values}
+            is_saving={formik.isSubmitting}
             is_valid={is_valid}
-            onChange={handleChange}
-            onSubmit={handleSubmit} />
+            onChange={formik.handleChange}
+            onSubmit={formik.handleSubmit} />
     }
 }
 

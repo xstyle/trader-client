@@ -4,9 +4,9 @@ import { ChangeEventHandler, FormEventHandler, useState } from "react"
 import { Breadcrumb, Button, Card, Container, Form } from "react-bootstrap"
 import Header from "../../components/Header"
 import { NewListType } from "../../types/ListType"
-import { applyChangeToData, getValueFromInput } from "../../utils/defaultTypePath"
 import { HOSTNAME } from "../../utils/env"
 import { defaultGetServerSideProps } from "../../utils"
+import { useFormik } from "formik"
 
 export const getServerSideProps = defaultGetServerSideProps
 
@@ -41,38 +41,30 @@ interface ListCreatorCtrlInterface {
 function ListCreatorCtrl<TProps extends {}>(Component: React.ComponentType<TProps & ListCreatorCtrlInterface>): React.FC<TProps> {
     return (props) => {
         const router = useRouter()
-        const [list, setList] = useState<NewListType>({
-            name: ''
+
+        const { values: list, handleChange, handleSubmit, isSubmitting } = useFormik({
+            initialValues: {
+                name: ''
+            },
+            onSubmit: async (values) => {
+                const response = await fetch(`http://${HOSTNAME}:3001/list`, {
+                    method: 'POST',
+                    body: JSON.stringify(values),
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                })
+                const body = await response.json()
+                router.replace(`/list/${body._id}`)
+            }
         })
-
-        const [is_saving, setSaving] = useState(false)
-
-        const handleChange: ChangeEventHandler<HTMLInputElement> = ({ target }) => {
-            const { name } = target
-            const value = getValueFromInput(target)
-            setList(applyChangeToData(list, name, value))
-        }
-
-        const handleSubmit: FormEventHandler<HTMLFormElement> = async (event) => {
-            setSaving(true)
-            event.preventDefault()
-            const response = await fetch(`http://${HOSTNAME}:3001/list`, {
-                method: 'POST',
-                body: JSON.stringify(list),
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-            })
-            const body = await response.json()
-            router.replace(`/list/${body._id}`)
-        }
 
         const is_valid = !!list.name
         return <Component
             {...props}
             list={list}
             is_valid={is_valid}
-            is_saving={is_saving}
+            is_saving={isSubmitting}
             onSubmit={handleSubmit}
             onChange={handleChange} />
     }

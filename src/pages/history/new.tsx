@@ -1,3 +1,4 @@
+import { useFormik } from "formik"
 import Head from "next/head"
 import Link from "next/link"
 import { useRouter } from "next/router"
@@ -7,7 +8,6 @@ import Header from "../../components/Header"
 import { SelectFigiInput } from "../../components/SelectFigi"
 import { NewHistoryType } from "../../types/HistoryType"
 import { defaultGetServerSideProps } from "../../utils"
-import { applyChangeToData, getValueFromInput } from "../../utils/defaultTypePath"
 import { HOSTNAME } from "../../utils/env"
 
 export const getServerSideProps = defaultGetServerSideProps
@@ -45,30 +45,24 @@ interface HistoryCreatorCtrlInterface {
 function HistoryCreatorCtrl<TProps extends {}>(Component: React.ComponentType<TProps & HistoryCreatorCtrlInterface>): React.FC<TProps> {
     return (props) => {
         const router = useRouter()
-        const [history, setData] = useState<NewHistoryType>({
-            title: '',
-            description: '',
-            figi: ''
+        const { values: history, handleChange, handleSubmit } = useFormik({
+            initialValues: {
+                title: '',
+                description: '',
+                figi: ''
+            },
+            onSubmit: async (values) => {
+                const response = await fetch(`http://${HOSTNAME}:3001/history`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(values)
+                })
+                const data = await response.json()
+                router.replace(`/history/${data._id}`)
+            }
         })
-
-        const handleChange: ChangeEventHandler<HTMLInputElement> = ({ target }) => {
-            const { name } = target
-            const value = getValueFromInput(target)
-            setData(applyChangeToData(history, name, value))
-        }
-
-        const handleSubmit: FormEventHandler<HTMLFormElement> = async (event) => {
-            event.preventDefault()
-            const response = await fetch(`http://${HOSTNAME}:3001/history`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(history)
-            })
-            const data = await response.json()
-            router.replace(`/history/${data._id}`)
-        }
 
         const is_valid = !!history.title && !!history.figi
 

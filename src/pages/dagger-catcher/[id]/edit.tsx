@@ -1,3 +1,4 @@
+import { useFormik } from "formik"
 import Link from "next/link"
 import { useRouter } from "next/router"
 import { ChangeEvent, ChangeEventHandler, FormEvent, FormEventHandler, useEffect, useState } from "react"
@@ -7,7 +8,6 @@ import { daggerCatcherProvider } from "../../../components/DaggerCatcher/DaggerC
 import Header from "../../../components/Header"
 import { DaggerCatcherProviderInterface } from "../../../types/DaggerCatcherType"
 import { defaultGetServerSideProps } from "../../../utils"
-import { applyChangeToData, getValueFromInput } from "../../../utils/defaultTypePath"
 import { HOSTNAME } from "../../../utils/env"
 
 export const getServerSideProps = defaultGetServerSideProps
@@ -51,36 +51,28 @@ interface DaggerCatcherEditorCtrlInterface {
 
 function DaggerCatcherEditorCtrl<TProps extends DaggerCatcherProviderInterface>(Component: React.ComponentType<TProps & DaggerCatcherEditorCtrlInterface>): React.FC<TProps> {
     return (props) => {
-        const [daggerCatcher, setDaggerCatcher] = useState(props.daggerCatcher)
-        const [is_saving, setSaving] = useState(false)
+        const formik = useFormik({
+            initialValues: props.daggerCatcher,
+            onSubmit: async (values) => {
+                await fetch(`http://${HOSTNAME}:3001/dagger-catcher/${values._id}`, {
+                    method: 'POST',
+                    body: JSON.stringify(values),
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                })
+                mutate(props.source_url)
+            }
+        })
 
-        function handleChange({ target }: ChangeEvent<HTMLInputElement>) {
-            const { name } = target
-            const value = getValueFromInput(target)
-            setDaggerCatcher(applyChangeToData(daggerCatcher, name, value))
-        }
+        useEffect(() => { formik.setValues(props.daggerCatcher) }, [props.daggerCatcher])
 
-        useEffect(() => setDaggerCatcher(props.daggerCatcher), [props.daggerCatcher])
-
-        async function handleSubmit(event: FormEvent<HTMLFormElement>) {
-            setSaving(true)
-            event.preventDefault()
-            await fetch(`http://${HOSTNAME}:3001/dagger-catcher/${daggerCatcher._id}`, {
-                method: 'POST',
-                body: JSON.stringify(daggerCatcher),
-                headers: {
-                    'Content-Type': 'application/json'
-                }
-            })
-            mutate(props.source_url)
-            setSaving(false)
-        }
         return <Component
             {...props}
-            daggerCatcher={daggerCatcher}
-            is_saving={is_saving}
-            onChange={handleChange}
-            onSubmit={handleSubmit} />
+            daggerCatcher={formik.values}
+            is_saving={formik.isSubmitting}
+            onChange={formik.handleChange}
+            onSubmit={formik.handleSubmit} />
     }
 }
 

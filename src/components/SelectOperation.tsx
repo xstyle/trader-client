@@ -1,10 +1,10 @@
-import { ChangeEvent, ChangeEventHandler, useState } from "react"
-import { Button, ButtonGroup, Form, Modal, ModalProps, Table, ToggleButton, ToggleButtonGroup } from "react-bootstrap"
-import ReactDatePicker from "react-datepicker"
+import { useFormik } from "formik";
+import { ChangeEventHandler, useState } from "react";
+import { Button, ButtonGroup, Form, Modal, Table, ToggleButton } from "react-bootstrap";
+import ReactDatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
-import Moment from "react-moment"
-import { OperationsProviderInterface, OperationsSourceUrlProviderInterface, Operation } from "../types/OperationType";
-import { getValueFromInput, applyChangeToData } from "../utils/defaultTypePath"
+import Moment from "react-moment";
+import { Operation, OperationsProviderInterface, OperationsSourceUrlProviderInterface } from "../types/OperationType";
 import { operationsProvider } from "./Operation/OperationProvider";
 
 export function SelectOperation({
@@ -97,9 +97,12 @@ export interface OperationsSelectorCtrlInterface {
 
 function OperationsSelectorCtrl<TProps extends OperationsSourceUrlProviderInterface & OperationsProviderInterface & { exclude: string[], onSelect(operation: Operation): Promise<void> }>(Component: React.ComponentType<TProps & OperationsSelectorCtrlInterface>): React.FC<TProps> {
     return (props) => {
-        const [state, setState] = useState<{ filter: "all" | "unselected", status: "all" | "done" }>({
-            filter: "all",
-            status: "all"
+        const formik = useFormik<{ filter: "all" | "unselected", status: "all" | "done" }>({
+            initialValues: {
+                filter: "all",
+                status: "all"
+            },
+            onSubmit: ()=> {}
         })
         const { operations } = props
         operations.sort((a, b) => a.date > b.date ? 1 : a.date < b.date ? -1 : 0)
@@ -115,7 +118,7 @@ function OperationsSelectorCtrl<TProps extends OperationsSourceUrlProviderInterf
                 }
             })
             .filter(operation => {
-                switch (state.filter) {
+                switch (formik.values.filter) {
                     case "unselected":
                         return props.exclude.indexOf(operation.id) < 0
                         break;
@@ -125,7 +128,7 @@ function OperationsSelectorCtrl<TProps extends OperationsSourceUrlProviderInterf
                 }
             })
             .filter(operation => {
-                switch (state.status) {
+                switch (formik.values.status) {
                     case "done":
                         return operation.status === "Done"
                         break;
@@ -134,11 +137,6 @@ function OperationsSelectorCtrl<TProps extends OperationsSourceUrlProviderInterf
                         break;
                 }
             })
-        function handleChange({ target }: ChangeEvent<HTMLInputElement>) {
-            const { name } = target
-            const value = getValueFromInput(target)
-            setState(applyChangeToData(state, name, value))
-        }
 
         const amount = filtered_operation.reduce((sum, operation) => {
             switch (operation.operationType) {
@@ -155,8 +153,8 @@ function OperationsSelectorCtrl<TProps extends OperationsSourceUrlProviderInterf
 
         return <Component
             {...props}
-            {...state}
-            onChange={handleChange}
+            {...formik.values}
+            onChange={formik.handleChange}
             operations={filtered_operation}
             amount={amount} />
     }

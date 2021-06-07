@@ -9,8 +9,8 @@ import { SelectFigiInput } from "../../components/SelectFigi"
 import { CandleFieldValue } from "../../components/Candle"
 import { NewDaggerCatcherType } from "../../types/DaggerCatcherType"
 import { defaultGetServerSideProps } from "../../utils"
-import { applyChangeToData, getValueFromInput } from "../../utils/defaultTypePath"
 import { HOSTNAME } from "../../utils/env"
+import { useFormik } from "formik"
 
 export const getServerSideProps = defaultGetServerSideProps
 
@@ -101,46 +101,38 @@ interface DaggerCatcherCreatorCtrlInterface {
 function DaggerCatcherCreatorCtrl<TProps extends { figi: string }>(Component: ComponentType<TProps & DaggerCatcherCreatorCtrlInterface>): FC<TProps> {
     return (props) => {
         const router = useRouter()
-        const [dagger_catcher, setData] = useState<NewDaggerCatcherType>({
-            figi: props.figi || '',
-            max: 0,
-            min: 0,
+        const formik = useFormik<NewDaggerCatcherType>({
+            initialValues: {
+                figi: props.figi || '',
+                max: 0,
+                min: 0,
+            },
+            onSubmit: async (values) => {
+                const response = await fetch(`http://${HOSTNAME}:3001/dagger-catcher`, {
+                    method: 'POST',
+                    body: JSON.stringify(values),
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                })
+                const data = await response.json()
+                router.replace(`/dagger-catcher/${data._id}/edit`)
+            }
         })
-        const [is_saving, setSaving] = useState(false)
 
-        const handleChange: ChangeEventHandler<FormControlElement> = ({ target }) => {
-            const { name } = target
-            const value = getValueFromInput(target)
-            setData(applyChangeToData(dagger_catcher, name, value))
-        }
-
-        const handleSubmit: FormEventHandler<HTMLFormElement> = async (event) => {
-            setSaving(true)
-            event.preventDefault()
-            const response = await fetch(`http://${HOSTNAME}:3001/dagger-catcher`, {
-                method: 'POST',
-                body: JSON.stringify(dagger_catcher),
-                headers: {
-                    'Content-Type': 'application/json'
-                }
-            })
-            const data = await response.json()
-            router.replace(`/dagger-catcher/${data._id}/edit`)
-        }
-        const is_valid: boolean = !!dagger_catcher.figi
-            && !!dagger_catcher.min
-            && !!dagger_catcher.max
-            && dagger_catcher.min > 0
-            && dagger_catcher.max > 0
-            && dagger_catcher.min < dagger_catcher.max
+        const is_valid: boolean = !!formik.values.figi
+            && !!formik.values.min
+            && !!formik.values.max
+            && formik.values.min > 0
+            && formik.values.max > 0
+            && formik.values.min < formik.values.max
 
         return <Component
             {...props}
-            dagger_catcher={dagger_catcher}
-            is_saving={is_saving}
+            dagger_catcher={formik.values}
+            is_saving={formik.isSubmitting}
             is_valid={is_valid}
-            onChange={handleChange}
-            onSubmit={handleSubmit} />
+            onChange={formik.handleChange}
+            onSubmit={formik.handleSubmit} />
     }
-
 }

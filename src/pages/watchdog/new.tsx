@@ -1,13 +1,13 @@
+import { useFormik } from "formik"
 import Head from "next/head"
 import Link from "next/link"
 import { useRouter } from "next/router"
-import React, { ChangeEventHandler, FormEventHandler, useState } from "react"
+import React, { ChangeEventHandler, FormEventHandler } from "react"
 import { Breadcrumb, Button, Card, Container, Form } from "react-bootstrap"
 import Header from "../../components/Header"
 import { SelectFigiInput } from "../../components/SelectFigi"
 import { NewWatchdogType } from "../../types/WatchdogType"
 import { defaultGetServerSideProps } from "../../utils"
-import { applyChangeToData, getValueFromInput } from "../../utils/defaultTypePath"
 import { HOSTNAME } from "../../utils/env"
 
 export const getServerSideProps = defaultGetServerSideProps
@@ -48,39 +48,30 @@ interface WatchDogCreatorCtrlInterface {
 function WatchDogCreatorCtrl<TProps extends object>(Component: React.ComponentType<TProps & WatchDogCreatorCtrlInterface>): React.FC<TProps> {
     return (props) => {
         const router = useRouter()
-        const [watchdog, setData] = useState<NewWatchdogType>({
-            figi: (router.query.figi || "") as string,
-            threshold: 1
+        const { values: watchdog, handleChange, handleSubmit, isSubmitting } = useFormik<NewWatchdogType>({
+            initialValues: {
+                figi: (router.query.figi || "") as string,
+                threshold: 1
+            },
+            onSubmit: async (values) => {
+                const url = new URL('/watchdog', `http://${HOSTNAME}:3001`)
+                const response = await fetch(url.href, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(values)
+                })
+                const data = await response.json()
+                router.replace(`/watchdog/${data._id}`)
+            }
         })
-        const [is_loading, setLoading] = useState(false)
-
-        const handleSubmit: FormEventHandler<HTMLFormElement> = async (event) => {
-            event.preventDefault()
-            setLoading(true)
-            const url = new URL('/watchdog', `http://${HOSTNAME}:3001`)
-
-            const response = await fetch(url.href, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(watchdog)
-            })
-            const data = await response.json()
-            router.replace(`/watchdog/${data._id}`)
-        }
-
-        const handleChange: ChangeEventHandler<HTMLInputElement> = ({ target }) => {
-            const { name } = target
-            const value = getValueFromInput(target)
-            setData(applyChangeToData(watchdog, name, value))
-        }
         const is_valid = !!watchdog.figi
         return <Component
             {...props}
             watchdog={watchdog}
             is_valid={is_valid}
-            is_loading={is_loading}
+            is_loading={isSubmitting}
             onChange={handleChange}
             onSubmit={handleSubmit} />
     }

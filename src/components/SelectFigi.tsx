@@ -1,7 +1,7 @@
+import { useFormik, useFormikContext } from "formik";
 import { ChangeEvent, ChangeEventHandler, FormEvent, useState } from "react";
 import { Form, ListGroup, Modal, ModalProps } from "react-bootstrap";
 import { StocksProviderInterface, StocksSourceUrlProvider } from "../types/StockType";
-import { getValueFromInput } from "../utils/defaultTypePath";
 import { stocksProdiver } from "./Stock/StockProvider";
 
 export function SelectFigiInput({
@@ -45,12 +45,12 @@ export function SelectFigiInput({
 }
 
 export function SelectFigi({ onClose, onSelect, show }: ModalProps & { onSelect(figi: string): void }) {
-    const [search, setSearch] = useState('')
-    function handleChange({ target }: ChangeEvent<HTMLInputElement>) {
-        const { name } = target
-        const value = getValueFromInput(target)
-        setSearch(value)
-    }
+    const formik = useFormik({
+        initialValues: {
+            search: ''
+        },
+        onSubmit: () => { }
+    })
     return <Modal
         autoFocus={true}
         show={show}
@@ -64,16 +64,15 @@ export function SelectFigi({ onClose, onSelect, show }: ModalProps & { onSelect(
                 <Form.Group>
                     <Form.Control
                         name="search"
-                        as="input"
                         autoFocus
-                        value={search}
+                        value={formik.values.search}
                         placeholder="Type text to search Instrument..."
-                        onChange={handleChange}
+                        onChange={formik.handleChange}
                         type="text" />
                 </Form.Group>
             </Form>
             <StocksList
-                search={search}
+                search={formik.values.search}
                 onSelect={onSelect} />
         </Modal.Body>
     </Modal>
@@ -94,9 +93,9 @@ function StocksListView({ instruments, onSelect }: StocksProviderInterface & Sto
                     eventKey={instrument.figi}
                     className="flex-column"
                     as="button">
-                        <h5>{instrument.name}</h5>
-                        <small>{instrument.ticker}</small> <small className="text-muted">{instrument.type}</small> <small className="text-muted">{instrument.currency}</small>
-                     
+                    <h5>{instrument.name}</h5>
+                    <small>{instrument.ticker}</small> <small className="text-muted">{instrument.type}</small> <small className="text-muted">{instrument.currency}</small>
+
                 </ListGroup.Item>
             )
         }

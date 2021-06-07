@@ -1,3 +1,4 @@
+import { Formik, useFormik } from "formik"
 import Head from "next/head"
 import Link from "next/link"
 import { useRouter } from "next/router"
@@ -7,7 +8,6 @@ import { mutate } from "swr"
 import Header from "../../../components/Header"
 import { listProvider } from "../../../components/List/ListProvider"
 import { ListProviderInterface } from "../../../types/ListType"
-import { applyChangeToData, getValueFromInput } from "../../../utils/defaultTypePath"
 import { HOSTNAME } from "../../../utils/env"
 import { defaultGetServerSideProps } from "../../../utils/index"
 
@@ -54,36 +54,28 @@ interface ListEditorCtrlInterface {
 function ListEditorCtrl<TProps extends ListProviderInterface>(Component: React.ComponentType<TProps & ListEditorCtrlInterface>): React.FC<TProps> {
     return (props) => {
         const { source_url } = props
-        const [list, setList] = useState(props.list)
-        useEffect(() => setList(props.list), [props.list])
-        const [is_saving, setSaving] = useState(false)
+        const { values: list, handleChange, handleSubmit, isSubmitting, setValues } = useFormik({
+            initialValues: props.list,
+            onSubmit: async (values) => {
+                await fetch(`http://${HOSTNAME}:3001/list/${list._id}`, {
+                    method: 'POST',
+                    body: JSON.stringify(values),
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                })
+                await mutate(source_url)
+            }
+        })
+        useEffect(() => { setValues(props.list) }, [props.list])
 
-        async function handleSubmit(event: FormEvent<HTMLFormElement>) {
-            event.preventDefault()
-            setSaving(true)
-            await fetch(`http://${HOSTNAME}:3001/list/${list._id}`, {
-                method: 'POST',
-                body: JSON.stringify(list),
-                headers: {
-                    'Content-Type': 'application/json'
-                }
-            })
-            mutate(source_url)
-            setSaving(false)
-        }
-
-        function handleChange({ target }: ChangeEvent<HTMLInputElement>) {
-            const { name } = target
-            const value = getValueFromInput(target)
-            setList(applyChangeToData(list, name, value))
-        }
         const is_valid = !!list.name
 
         return <Component
             {...props}
             list={list}
             is_valid={is_valid}
-            is_saving={is_saving}
+            is_saving={isSubmitting}
             onChange={handleChange}
             onSubmit={handleSubmit} />
     }

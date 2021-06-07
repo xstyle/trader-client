@@ -1,3 +1,4 @@
+import { useFormik } from 'formik'
 import Head from 'next/head'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
@@ -9,7 +10,6 @@ import { MarketInstrumentPrice } from '../../../components/Price'
 import { robotProvider } from "../../../components/Robot/RobotProvider"
 import { RobotProviderInterface } from '../../../types/RobotType'
 import { defaultGetServerSideProps } from '../../../utils'
-import { applyChangeToData, getValueFromInput } from '../../../utils/defaultTypePath'
 import { HOSTNAME } from '../../../utils/env'
 
 export const getServerSideProps = defaultGetServerSideProps
@@ -67,30 +67,31 @@ interface RobotEditorCtrlInterface {
 function InstrumentEditorCtrl<TProps extends RobotProviderInterface>(Component: React.ComponentType<TProps & RobotEditorCtrlInterface>): React.FC<TProps> {
     return (props) => {
         const { source_url } = props
-        const [robot, setRobot] = useState(props.robot)
-        useEffect(() => setRobot(props.robot), [props.robot])
+        const { values: robot, handleChange, handleSubmit, isSubmitting, setValues } = useFormik({
+            initialValues: props.robot,
+            onSubmit: async (values) => {
+                const response = await fetch(source_url, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(values)
+                })
+                mutate(source_url)
+                if (response.statusText === "OK") {
+                    showAlert('success')
+                } else {
+                    showAlert('error')
+                }
+            }
+        })
+        useEffect(() => { setValues(props.robot) }, [props.robot])
 
         const [alert, setAlert] = useState({
             error: false,
             success: false
         })
-        async function handleSubmit(event: FormEvent<HTMLFormElement>) {
-            event.preventDefault()
 
-            const response = await fetch(source_url, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(robot)
-            })
-            mutate(source_url)
-            if (response.statusText === "OK") {
-                showAlert('success')
-            } else {
-                showAlert('error')
-            }
-        }
 
         function showAlert(name: keyof { error: boolean, success: boolean }, timeout = 5000) {
             setAlert({
@@ -103,21 +104,15 @@ function InstrumentEditorCtrl<TProps extends RobotProviderInterface>(Component: 
             }), timeout)
         }
 
-        function handleChange({ target }: ChangeEvent<HTMLInputElement>) {
-            const { name } = target
-            const value = getValueFromInput(target)
-            setRobot(applyChangeToData(robot, name, value))
-        }
-
         function handleAddTag() {
             console.log(robot.tags)
-            setRobot({ ...robot, tags: [...robot.tags, ''] })
+            setValues({ ...robot, tags: [...robot.tags, ''] })
         }
 
         function handleRemoveTag(index: number) {
             const tags = [...robot.tags]
             tags.splice(index, 1)
-            setRobot({ ...robot, tags })
+            setValues({ ...robot, tags })
         }
 
         async function handleRemove() {
