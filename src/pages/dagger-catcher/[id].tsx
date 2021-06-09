@@ -17,6 +17,7 @@ import { OrderType } from "../../types/OrderType";
 import { defaultGetServerSideProps } from "../../utils";
 import { DaggerCatcherCtrl, DaggerCatcherCtrlInterface } from '../../components/DaggerCatcher/DaggerCatcherController';
 import { OrderbookPositionPrice } from '../../components/Orderbook';
+import { TickerNavbar } from '../../components/TickerNavbar';
 
 export const getServerSideProps = defaultGetServerSideProps
 
@@ -32,16 +33,19 @@ function Body() {
     const { id } = query
     if (!id) return null
     if (Array.isArray(id)) return null
-    return <Container fluid>
-        <Row>
-            <Col xl="2" lg={3} md={4} className="d-none d-md-block">
-                <SideBar id={id} />
-            </Col>
-            <Col xl="10" lg={9} md={8} >
-                <DaggerCatcher id={id} />
-            </Col>
-        </Row>
-    </Container>
+    return <>
+        <TickerNavbar figi={id} activeKey="dagger" />
+        <Container fluid>
+            <Row>
+                <Col xl="2" lg={3} md={4} className="d-none d-md-block">
+                    <SideBar id={id} />
+                </Col>
+                <Col xl="10" lg={9} md={8} >
+                    <DaggerCatcher id={id} />
+                </Col>
+            </Row>
+        </Container>
+    </>
 }
 
 const SideBar = daggerCatchersProvider(SideBarView)
@@ -143,7 +147,7 @@ function DaggerCatcherView({ daggerCatcher: catcher, onSubmit, state, onChange }
                     <div className="d-flex align-items-center">
                         <div>
                             <div className="">
-                                <OrderbookPositionPrice figi={catcher.figi} type="asks"/>
+                                <OrderbookPositionPrice figi={catcher.figi} type="asks" />
                             </div>
                             <div className="">
                                 <OrderbookPositionPrice figi={catcher.figi} type="bids" />

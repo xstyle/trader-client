@@ -11,6 +11,7 @@ import { MarketInstrumentField } from "../components/Candle"
 import Header from "../components/Header"
 import { operationsProvider } from "../components/Operation/OperationProvider"
 import { MultiSelectButtonGroupView } from "../components/SelectGroupButton"
+import { TickerNavbar } from "../components/TickerNavbar"
 import { OperationsProviderInterface, OperationsSourceUrlProviderInterface, OperationStatus } from "../types/OperationType"
 import { defaultGetServerSideProps } from "../utils"
 
@@ -28,10 +29,13 @@ export default function Page() {
 
 function Body() {
     const { query } = useRouter()
-    return <Container fluid>
-        <h1>Operations</h1>
-        <Layout figi={query.figi as string | undefined} />
-    </Container>
+    return <>
+        {query.figi ? <TickerNavbar figi={query.figi as string} activeKey="operations" /> : null}
+        <Container fluid>
+            <h1>Operations</h1>
+            <Layout figi={query.figi as string | undefined} />
+        </Container>
+    </>
 }
 
 const Layout = LayoutCtrl<{ figi: string | undefined }>(LayoutView)
@@ -58,7 +62,7 @@ function LayoutCtrl<TProps extends {}>(Component: React.ComponentType<TProps & L
             status: ["Done"],
             types: ["Buy", "Sell"]
         })
-Date
+        Date
         function handleDateRangeChange([start_date, end_date]: [Date, Date?]) {
             start_date.setHours(0, 0, 0, 0)
             end_date && end_date.setHours(23, 59, 59, 999)

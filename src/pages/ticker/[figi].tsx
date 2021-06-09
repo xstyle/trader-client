@@ -14,6 +14,7 @@ import useSuperCandle, { useStatefullSuperCandleHistory } from "../../components
 import { defaultGetServerSideProps } from "../../utils"
 import { HOSTNAME } from "../../utils/env"
 import { OrderbookTable } from "../../components/Orderbook"
+import { TickerNavbar } from "../../components/TickerNavbar"
 
 export const getServerSideProps = defaultGetServerSideProps
 
@@ -26,7 +27,10 @@ export default Page
 function Body() {
   const router = useRouter()
   const figi = router.query.figi as string
-  return <MarketInstrumentInfo figi={figi} />
+  return <>
+    <TickerNavbar figi={figi} activeKey="ticker" />
+    <MarketInstrumentInfo figi={figi} />
+  </>
 }
 
 interface MarketInstrumentCtrlInterface {

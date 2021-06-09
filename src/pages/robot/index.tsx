@@ -11,6 +11,7 @@ import State from '../../components/State'
 import { MarketInstrumentField } from '../../components/Candle'
 import { RobotsProviderInterface, RobotsSourceUrlProviderInterface } from '../../types/RobotType'
 import { defaultGetServerSideProps } from '../../utils'
+import { TickerNavbar } from '../../components/TickerNavbar'
 
 export const getServerSideProps = defaultGetServerSideProps
 
@@ -29,16 +30,19 @@ const Sidebar = robotsProvider(SidebarCtrl(SidebarView))
 function Body() {
     const { query: { figi, tag } } = useRouter()
     const id = Array.isArray(figi) || !figi ? undefined : figi
-    return <Container fluid>
-        <Row>
-            <Col lg="2" className="d-none d-sm-block">
-                <Sidebar id={id} />
-            </Col>
-            <Col lg="10">
-                <MainView query={{ figi, tag }} />
-            </Col>
-        </Row>
-    </Container>
+    return <>
+        {id ? <TickerNavbar figi={id} activeKey="robots" /> : null}
+        <Container fluid>
+            <Row>
+                <Col lg="2" className="d-none d-sm-block">
+                    <Sidebar id={id} />
+                </Col>
+                <Col lg="10">
+                    <MainView query={{ figi, tag }} />
+                </Col>
+            </Row>
+        </Container>
+    </>
 }
 
 interface SidebarCtrlInterface {
