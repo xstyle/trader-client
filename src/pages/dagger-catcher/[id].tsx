@@ -2,7 +2,7 @@ import Head from 'next/head';
 import Link from "next/link";
 import { useRouter } from "next/router";
 import { CSSProperties } from "react";
-import { Badge, Breadcrumb, Button, Card, Col, Container, Form, Nav, Row } from "react-bootstrap";
+import { Badge, Breadcrumb, Button, Card, Col, Container, Form, Nav, Navbar, Row } from "react-bootstrap";
 import Moment from "react-moment";
 import Chart from "../../components/Chart";
 import { daggerCatcherProvider, daggerCatchersProvider } from '../../components/DaggerCatcher/DaggerCatcherProvider';
@@ -35,52 +35,52 @@ function Body() {
     if (Array.isArray(id)) return null
     return <>
         <TickerNavbar figi={id} activeKey="dagger" />
-        <Container fluid>
-            <Row>
-                <Col xl="2" lg={3} md={4} className="d-none d-md-block">
-                    <SideBar id={id} />
-                </Col>
-                <Col xl="10" lg={9} md={8} >
-                    <DaggerCatcher id={id} />
-                </Col>
-            </Row>
-        </Container>
+        <div className="d-flex" style={{position: "relative"}}>
+            <SideBar id={id} />
+            <Container fluid>
+                <DaggerCatcher id={id} />
+            </Container>
+        </div>
+
     </>
 }
 
 const SideBar = daggerCatchersProvider(SideBarView)
 
-const style: CSSProperties = { position: 'sticky', top: '1rem' };
+const style: CSSProperties = { width: "180px", marginTop: "-20px" };
 
 function SideBarView({ id, daggerCatchers }: DaggerCatchersProviderInterface & { id: string }) {
-    return <Nav
-        variant="pills"
-        style={style}
-        className="flex-column">
-        {
-            daggerCatchers.map(catcher =>
-                <Link
-                    key={catcher._id}
-                    href={`/dagger-catcher/${catcher.figi}`}
-                    passHref>
-                    <Nav.Link
-                        active={catcher.figi === id}
-                        className="d-flex flex-row justify-content-between">
-                        <MarketInstrumentField
-                            figi={catcher.figi}
-                            fieldName="ticker" />
-                        <div>
-                            <Badge
-                                pill
-                                variant="light">
-                                <MarketInstrumentPrice figi={catcher.figi} />
-                            </Badge>
-                        </div>
-                    </Nav.Link>
-                </Link>
-            )
-        }
-    </Nav>
+    return <Navbar variant="dark" bg="secondary" style={style} className="align-items-start pl-2 pr-2 mb-0">
+        <Nav
+            className="flex-column" style={{ width: "100%", position: "sticky",  top: "50px" }}>
+            {
+                daggerCatchers.map(catcher =>
+                    <Link
+                        key={catcher._id}
+                        href={`/dagger-catcher/${catcher.figi}`}
+                        passHref>
+                        <Nav.Link
+                            active={catcher.figi === id}
+                            className="d-flex justify-content-between">
+                            <b>
+                                <MarketInstrumentField
+                                    figi={catcher.figi}
+                                    fieldName="ticker" />
+                            </b>
+                            <div>
+                                {/* <Badge
+                                    pill
+                                    variant="light">
+                                    <MarketInstrumentPrice figi={catcher.figi} />
+                                </Badge> */}
+                                <MarketInstrumentPrice figi={catcher.figi} currency color className="small"/>
+                            </div>
+                        </Nav.Link>
+                    </Link>
+                )
+            }
+        </Nav>
+    </Navbar>
 }
 
 const DaggerCatcher = daggerCatcherProvider(DaggerCatcherCtrl(DaggerCatcherView))

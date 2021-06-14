@@ -9,8 +9,8 @@ interface TickerNavbarProps {
 }
 
 export function TickerNavbar(props: TickerNavbarProps) {
-    return <Navbar bg="secondary" variant="dark">
-        <Navbar.Brand>
+    return <Navbar bg="secondary" variant="dark" sticky="top" style={{marginTop: "-20px"}}>
+        <Navbar.Brand style={{width: "132px"}}>
             <b><MarketInstrumentField figi={props.figi} fieldName="ticker" /></b>
         </Navbar.Brand>
         <Nav activeKey={props.activeKey}>
