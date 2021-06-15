@@ -4,12 +4,25 @@ import { Col, Nav, Navbar } from "react-bootstrap";
 import { MarketInstrumentField } from "./Candle";
 import { MarketInstrumentPrice } from "./Price";
 
-const style: CSSProperties = { width: "180px", marginTop: "-20px" , height: "calc(100vh - 95px)"};
+const style: CSSProperties = { marginTop: "-20px", height: "calc(100vh - 95px)" };
 
-export function TickerSidebarView({ id, tickers, href }: { id?: string, tickers: { figi: string, _id: string }[], href(figi: string): string }) {
-    return <Navbar variant="dark" bg="secondary" style={style} className="align-items-start pl-2 pr-2 mb-0" as={Col}>
+interface TickerSidebarViewProps {
+    id?: string
+    tickers: { figi: string, _id: string }[]
+    href(figi: string): string
+}
+
+export function TickerSidebarView({ id, tickers, href }: TickerSidebarViewProps) {
+    return <Navbar
+        variant="dark"
+        bg="secondary"
+        style={style}
+        className="align-items-start mb-0"
+        lg={1}
+        as={Col}>
         <Nav
-            className="flex-column" style={{ width: "100%", position: "sticky", top: "50px" }}>
+            className="flex-column"
+            style={{ width: "100%", position: "sticky", top: "50px" }}>
             {
                 tickers.map(ticker =>
                     <Link
