@@ -1,6 +1,6 @@
 import Link from "next/link";
 import React from "react";
-import { Nav, Navbar } from "react-bootstrap";
+import { Col, Nav, Navbar } from "react-bootstrap";
 import { MarketInstrumentField } from "./Candle";
 
 interface TickerNavbarProps {

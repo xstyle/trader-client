@@ -18,6 +18,8 @@ import { defaultGetServerSideProps } from "../../utils";
 import { DaggerCatcherCtrl, DaggerCatcherCtrlInterface } from '../../components/DaggerCatcher/DaggerCatcherController';
 import { OrderbookPositionPrice } from '../../components/Orderbook';
 import { TickerNavbar } from '../../components/TickerNavbar';
+import { propTypes } from 'react-bootstrap/esm/Image';
+import { TickerSidebarView } from '../../components/TickerSidebar';
 
 export const getServerSideProps = defaultGetServerSideProps
 
@@ -35,53 +37,26 @@ function Body() {
     if (Array.isArray(id)) return null
     return <>
         <TickerNavbar figi={id} activeKey="dagger" />
-        <div className="d-flex" style={{position: "relative"}}>
-            <SideBar id={id} />
-            <Container fluid>
-                <DaggerCatcher id={id} />
-            </Container>
-        </div>
+        <Container fluid>
+            <Row>
+                <SideBar id={id} />
+                <Col lg="11">
+                    <DaggerCatcher id={id} />
+                </Col>
+            </Row>
 
+        </Container>
     </>
 }
 
-const SideBar = daggerCatchersProvider(SideBarView)
+const SideBar = daggerCatchersProvider<{ id: string }>((props) => {
+    return <TickerSidebarView
+        id={props.id}
+        tickers={props.daggerCatchers}
+        href={(figi: string) => `/dagger-catcher/${figi}`} />
+})
 
-const style: CSSProperties = { width: "180px", marginTop: "-20px" };
 
-function SideBarView({ id, daggerCatchers }: DaggerCatchersProviderInterface & { id: string }) {
-    return <Navbar variant="dark" bg="secondary" style={style} className="align-items-start pl-2 pr-2 mb-0">
-        <Nav
-            className="flex-column" style={{ width: "100%", position: "sticky",  top: "50px" }}>
-            {
-                daggerCatchers.map(catcher =>
-                    <Link
-                        key={catcher._id}
-                        href={`/dagger-catcher/${catcher.figi}`}
-                        passHref>
-                        <Nav.Link
-                            active={catcher.figi === id}
-                            className="d-flex justify-content-between">
-                            <b>
-                                <MarketInstrumentField
-                                    figi={catcher.figi}
-                                    fieldName="ticker" />
-                            </b>
-                            <div>
-                                {/* <Badge
-                                    pill
-                                    variant="light">
-                                    <MarketInstrumentPrice figi={catcher.figi} />
-                                </Badge> */}
-                                <MarketInstrumentPrice figi={catcher.figi} currency color className="small"/>
-                            </div>
-                        </Nav.Link>
-                    </Link>
-                )
-            }
-        </Nav>
-    </Navbar>
-}
 
 const DaggerCatcher = daggerCatcherProvider(DaggerCatcherCtrl(DaggerCatcherView))
 
