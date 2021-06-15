@@ -203,25 +203,6 @@ function DaggerCatcherView({ daggerCatcher: catcher, onSubmit, state, onChange }
         </Row>
         <Form.Group>
             <Link
-                href={{
-                    pathname: "/robot",
-                    query: {
-                        figi: catcher.figi
-                    }
-                }}
-                passHref>
-                <Button
-                    className="mr-2"
-                    variant={"secondary"}>Robots</Button>
-            </Link>
-            <Link
-                href={`/ticker/${catcher.figi}`}
-                passHref>
-                <Button
-                    className="mr-2"
-                    variant={"secondary"}>Ticker</Button>
-            </Link>
-            <Link
                 href={`/dagger-catcher/${catcher._id}/edit`}
                 passHref>
                 <Button variant={"secondary"}>Edit</Button>

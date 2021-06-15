@@ -1,7 +1,7 @@
 import Link from "next/link"
 import { useRouter } from "next/router"
 import React, { useState } from "react"
-import { Button, Card, Col, Container, ListGroup, Row, Table } from "react-bootstrap"
+import { Button, ButtonToolbar, Card, Col, Container, ListGroup, Row, Table } from "react-bootstrap"
 import Chart from "../../components/Chart"
 import { PageWithHeader } from "../../components/Header"
 import { InstrumentsLink, TinLink } from "../../components/Links"
@@ -68,40 +68,13 @@ function MarketInstrumentInfoView({ marketInstrument, onImportAllOrder, is_impor
         </p>
         <p>Value {candle.v}</p>
         <p>Number {candle.n}</p>
-        <div className="form-group">
-          <Link
-            passHref
-            href={{
-              pathname: '/robot/new',
-              query: {
-                figi: marketInstrument.figi,
-                buy_price: candle.c,
-                name: marketInstrument.name
-              }
-            }}>
-            <Button
-              variant="success"
-              className="mr-2 mb-2">Create</Button>
-          </Link>
+        <ButtonToolbar>
           <Button
             className="mr-2 mb-2"
             variant={"secondary"}
             disabled={is_importing}
             onClick={onImportAllOrder}>{is_importing ? "Importing..." : "Import"}</Button>
-          <InstrumentsLink figi={marketInstrument.figi}>
-            <Button
-              variant="secondary"
-              className="mr-2 mb-2">Robots</Button>
-          </InstrumentsLink>
-          <Link
-            href={`/dagger-catcher/${marketInstrument.figi}`}
-            passHref>
-            <Button
-              variant="secondary"
-              className="mr-2 mb-2">Dagger Catcher</Button>
-          </Link>
-          <TinLink figi={marketInstrument.figi} />
-        </div>
+        </ButtonToolbar>
         <Statistica figi={marketInstrument.figi} status={["Done", "New"]} />
       </Col>
       <Col xl={7} lg={8} md={7} >
