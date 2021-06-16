@@ -1,18 +1,17 @@
 import Head from 'next/head'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
-import React, { CSSProperties } from 'react'
-import { Badge, Col, Container, Form, Nav, Navbar, Row } from 'react-bootstrap'
+import React from 'react'
+import { Col, Container, Form, Row } from 'react-bootstrap'
+import { MarketInstrumentField } from '../../components/Candle'
 import Header from '../../components/Header'
-import { MarketInstrumentPrice } from '../../components/Price'
 import { robotsProvider } from '../../components/Robot/RobotProvider'
 import Robots from '../../components/Robots'
 import State from '../../components/State'
-import { MarketInstrumentField } from '../../components/Candle'
-import { RobotsProviderInterface, RobotsSourceUrlProviderInterface } from '../../types/RobotType'
-import { defaultGetServerSideProps } from '../../utils'
 import { TickerNavbar } from '../../components/TickerNavbar'
 import { TickerSidebarView } from '../../components/TickerSidebar'
+import { RobotsProviderInterface, RobotsSourceUrlProviderInterface } from '../../types/RobotType'
+import { defaultGetServerSideProps } from '../../utils'
 
 export const getServerSideProps = defaultGetServerSideProps
 
@@ -46,7 +45,7 @@ function Body() {
         <Container fluid>
             <Row>
                 <Sidebar id={id} />
-                <Col lg="11">
+                <Col lg="10">
                     <MainView query={{ figi, tag }} />
                 </Col>
             </Row>

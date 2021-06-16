@@ -1,25 +1,23 @@
 import Head from 'next/head';
 import Link from "next/link";
 import { useRouter } from "next/router";
-import { CSSProperties } from "react";
-import { Badge, Breadcrumb, Button, Card, Col, Container, Form, Nav, Navbar, Row } from "react-bootstrap";
+import { Breadcrumb, Button, Card, Col, Container, Form, Row } from "react-bootstrap";
 import Moment from "react-moment";
+import useSuperCandle, { MarketInstrumentField, useMarketInstrument } from "../../components/Candle";
 import Chart from "../../components/Chart";
+import { DaggerCatcherCtrl, DaggerCatcherCtrlInterface } from '../../components/DaggerCatcher/DaggerCatcherController';
 import { daggerCatcherProvider, daggerCatchersProvider } from '../../components/DaggerCatcher/DaggerCatcherProvider';
 import Header from "../../components/Header";
+import { OrderbookPositionPrice } from '../../components/Orderbook';
 import { OrdersCtrl, OrdersCtrlInterface, ordersProvider, OrdersProviderInterface, OrdersSourceUrlProviderOptions, OrdersTable } from "../../components/Orders";
-import Price, { ColorPriceView, MarketInstrumentPrice } from "../../components/Price";
+import Price, { MarketInstrumentPrice } from "../../components/Price";
 import { Reports } from '../../components/Reports';
 import { useStatistica } from '../../components/Statistic/Statistic';
-import useSuperCandle, { MarketInstrumentField, useMarketInstrument } from "../../components/Candle";
-import { DaggerCatcherProviderInterface, DaggerCatchersProviderInterface } from '../../types/DaggerCatcherType';
+import { TickerNavbar } from '../../components/TickerNavbar';
+import { TickerSidebarView } from '../../components/TickerSidebar';
+import { DaggerCatcherProviderInterface } from '../../types/DaggerCatcherType';
 import { OrderType } from "../../types/OrderType";
 import { defaultGetServerSideProps } from "../../utils";
-import { DaggerCatcherCtrl, DaggerCatcherCtrlInterface } from '../../components/DaggerCatcher/DaggerCatcherController';
-import { OrderbookPositionPrice } from '../../components/Orderbook';
-import { TickerNavbar } from '../../components/TickerNavbar';
-import { propTypes } from 'react-bootstrap/esm/Image';
-import { TickerSidebarView } from '../../components/TickerSidebar';
 
 export const getServerSideProps = defaultGetServerSideProps
 
@@ -40,7 +38,7 @@ function Body() {
         <Container fluid>
             <Row>
                 <SideBar id={id} />
-                <Col lg="11">
+                <Col lg="10">
                     <DaggerCatcher id={id} />
                 </Col>
             </Row>

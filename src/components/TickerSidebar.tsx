@@ -4,7 +4,7 @@ import { Col, Nav, Navbar } from "react-bootstrap";
 import { MarketInstrumentField } from "./Candle";
 import { MarketInstrumentPrice } from "./Price";
 
-const style: CSSProperties = { marginTop: "-20px", height: "calc(100vh - 95px)" };
+const style: CSSProperties = { marginTop: "-20px", minHeight: "calc(100vh - 95px)" };
 
 interface TickerSidebarViewProps {
     id?: string
@@ -17,8 +17,8 @@ export function TickerSidebarView({ id, tickers, href }: TickerSidebarViewProps)
         variant="dark"
         bg="secondary"
         style={style}
-        className="align-items-start mb-0"
-        lg={1}
+        className="align-items-start mb-0 d-none d-lg-block"
+        lg={2}
         as={Col}>
         <Nav
             className="flex-column"
