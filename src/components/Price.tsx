@@ -31,6 +31,9 @@ export function MarketInstrumentPriceWithCurrency({ figi, price, className = "",
         case "USD":
             suffix = "$"
             break;
+        case "RUB":
+            suffix = "₽"
+            break;
         default:
             break;
     }
