@@ -1,7 +1,7 @@
 import Link from "next/link"
 import { useRouter } from "next/router"
 import React, { CSSProperties } from "react"
-import { Button, Col, Form, Row, Table } from "react-bootstrap"
+import { Button, Card, Col, Form, Row, Table } from "react-bootstrap"
 import Moment from "react-moment"
 import { mutate } from "swr"
 import { RobotProviderInterface, RobotsProviderInterface, RobotsSourceUrlProviderInterface, RobotType } from "../types/RobotType"
@@ -61,27 +61,33 @@ const style: CSSProperties = {
     backgroundColor: "#222"
 }
 function RobotsGroupView(props: RobotsProviderInterface & RobotsSourceUrlProviderInterface & { figi: string }) {
-    return <div className="">
-        <div style={style} className="pb-2 pt-2">
-            <Row>
-                <Col xs="auto">
-                    <h4 className="mb-0 ">
-                        <Link href={`/ticker/${props.figi}`}>
-                            <a className="text-body">
-                                <MarketInstrumentField figi={props.figi} fieldName={"ticker"} />
-                            </a>
-                        </Link>
-                    </h4>
-                </Col>
-                <Col className="align-self-end">
-                    <MarketInstrumentPrice figi={props.figi} />
-                </Col>
-            </Row>
-
-        </div>
-
-        <RobotsTableView {...props} />
-    </div>
+    return <>
+        <Row
+            style={style}
+            className="pb-2 pt-2 mt-3 align-items-end">
+            <Col>
+                <h2 className="mb-0 ">
+                    <Link href={`/ticker/${props.figi}`}>
+                        <a className="text-body">
+                            <MarketInstrumentField
+                                figi={props.figi}
+                                fieldName={"ticker"} />
+                        </a>
+                    </Link>
+                </h2>
+            </Col>
+            <Col xs="auto">
+                <b>
+                    <MarketInstrumentPrice
+                        figi={props.figi}
+                        currency />
+                </b>
+            </Col>
+        </Row>
+        <Card>
+            <RobotsTableView {...props} />
+        </Card>
+    </>
 }
 
 function RobotFooter(props: RobotsProviderInterface & RobotsSourceUrlProviderInterface & { figi: string }) {
