@@ -103,14 +103,6 @@ function DaggerCatcherView({ daggerCatcher: catcher, onSubmit, state, onChange }
         <Head>
             <title>{marketInstrument && marketInstrument.ticker} {candle && candle.c.toFixed(2)}</title>
         </Head>
-        <Breadcrumb>
-            <Link href="/dagger-catcher" passHref>
-                <Breadcrumb.Item>Dagger Catchers</Breadcrumb.Item>
-            </Link>
-            <Breadcrumb.Item active>
-                <MarketInstrumentField figi={catcher.figi} fieldName={"ticker"} />
-            </Breadcrumb.Item>
-        </Breadcrumb>
         <Row>
             <Col sm="12" md="6">
                 <div className="d-flex flex-row">
