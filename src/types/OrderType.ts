@@ -6,7 +6,7 @@ export type OrderType = {
     orderId: string;
     figi: string;
     executedLots: number;
-    operation: string;
+    operation: "Buy" | "Sell" | "BuyCard";
     payment: number;
     commission?: {
         value: number;

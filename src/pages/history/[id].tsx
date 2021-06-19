@@ -2,13 +2,13 @@ import Head from "next/head";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import React from "react";
-import { Breadcrumb, Button, Card, Container, Form } from "react-bootstrap";
+import { Breadcrumb, Button, Card, Container } from "react-bootstrap";
 import Moment from "react-moment";
 import { PageWithHeader } from "../../components/Header";
 import { historyProvider } from "../../components/History/HistoryProvider";
-import { OrdersCtrl, OrdersCtrlInterface, ordersProvider, OrdersProviderInterface, OrdersTable } from "../../components/Orders";
+import OperationsStatisticsView from "../../components/Operation/OperationsStatistics";
+import { ordersProvider } from "../../components/Orders";
 import { OrdersCollection } from "../../components/OrdersCollection";
-import { Reports } from "../../components/Reports";
 import { HistoryProviderInterface } from "../../types/HistoryType";
 import { defaultGetServerSideProps } from "../../utils";
 
@@ -44,8 +44,8 @@ function Body() {
                 <Button
                     size="sm"
                     variant="secondary">
-                        <i className="fa fa-edit"/>
-                    </Button>
+                    <i className="fa fa-edit" />
+                </Button>
             </Link>
         </div>
         <History id={query.id as string} />
@@ -73,8 +73,24 @@ function HistoryView({ history }: HistoryProviderInterface) {
                 </dl>
             </Card.Body>
         </Card>
+        <h2 className="mb-3 mt-5">Statistics</h2>
+        <Card>
+            <OperationsStatistics
+                collection={history._id}
+                figi={history.figi} />
+        </Card>
         <OrdersCollection
             collection={history._id}
             figi={history.figi} />
     </>
 }
+
+const OperationsStatistics = ordersProvider((props) => {
+    return <OperationsStatisticsView
+        operations={props.orders.map(order => ({
+            operationType: order.operation,
+            figi: order.figi,
+            payment: order.payment,
+            quantityExecuted: order.executedLots
+        }))} />
+})

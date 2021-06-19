@@ -1,22 +1,29 @@
 import React from "react"
 import { Table } from "react-bootstrap"
-import { Operation, OperationsProvider } from "../../types/OperationType"
+import { OperationsProvider } from "../../types/OperationType"
 import { MarketInstrumentField } from "../Candle"
 import { MarketInstrumentPriceWithCurrency } from "../Price"
 
-export default function OperationsStatistics(props: OperationsProvider) {
+interface OperationForStatistic {
+    figi: string
+    operationType: "Buy" | "Sell" | "BuyCard"
+    quantityExecuted: number
+    payment: number
+}
+
+export default function OperationsStatisticsView(props: { operations: OperationForStatistic[] }) {
     const operationsIndex = props.operations.reduce((result, operation) => {
         const instrument = result[operation.figi] ?? (result[operation.figi] = { operations: [], figi: operation.figi })
         instrument.operations.push(operation)
         return result
     }, {} as {
         [id: string]: {
-            operations: Operation[]
+            operations: OperationForStatistic[]
             figi: string
         }
     })
 
-    function getStatistic(instrumentOperation: { figi: string, operations: Operation[] }) {
+    function getStatistic(instrumentOperation: { figi: string, operations: OperationForStatistic[] }) {
         const buyOperations = instrumentOperation.operations.filter(operation => operation.operationType === "Buy")
         const sellOperations = instrumentOperation.operations.filter(operation => operation.operationType === "Sell")
         const buy = buyOperations.reduce((result, operation) => operation.quantityExecuted + result, 0)
@@ -44,7 +51,7 @@ export default function OperationsStatistics(props: OperationsProvider) {
     const instrumentsOperations = Object.values(operationsIndex)
     const instrumentsOperationsWithStatistics = instrumentsOperations.map(getStatistic)
 
-    return <Table bordered hover striped>
+    return <Table hover>
         <thead>
             <tr>
                 <th>FIGI</th>
@@ -60,7 +67,7 @@ export default function OperationsStatistics(props: OperationsProvider) {
         <tbody>
             {
                 instrumentsOperationsWithStatistics.map((instrumentsOperations) => (
-                    <tr>
+                    <tr key={instrumentsOperations.figi}>
                         <td>
                             <MarketInstrumentField
                                 figi={instrumentsOperations.figi}

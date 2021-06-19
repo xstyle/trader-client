@@ -131,11 +131,10 @@ const ReportTable = Paginator<ReportCtrlInterface>((props) => {
             <Pagination.Next onClick={props.onNextPage} disabled={props.next_page_disabled} />
             <Pagination.Last onClick={props.onSelectLastPage} disabled={props.last_page_disabled} />
         </Pagination>}
-        <Card>
+        <Card className="mb-3">
             <Card.Header>{props.first_item_on_page_index + 1} - {props.last_item_on_page_index + 1} из {props.items_number}</Card.Header>
             <ReportTableView {...props} />
         </Card>
-
     </>
 }, 'days')
 

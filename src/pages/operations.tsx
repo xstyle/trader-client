@@ -10,7 +10,7 @@ import Moment from "react-moment"
 import { MarketInstrumentField } from "../components/Candle"
 import Header from "../components/Header"
 import { operationsProvider } from "../components/Operation/OperationProvider"
-import OperationsStatistics from "../components/Operation/OperationsStatistics"
+import OperationsStatisticsView from "../components/Operation/OperationsStatistics"
 import { MultiSelectButtonGroupView } from "../components/SelectGroupButton"
 import { TickerNavbar } from "../components/TickerNavbar"
 import { OperationsProvider, OperationsProviderParams, OperationStatus } from "../types/OperationType"
@@ -197,7 +197,7 @@ function OperationsView(props: OperationsProvider & OperationsProviderParams & O
         <Card className="mb-3">
             <OperationTableView {...props} />
         </Card>
-        <OperationsStatistics {...props} />
+        <OperationsStatisticsView {...props} />
     </>
 }
 
