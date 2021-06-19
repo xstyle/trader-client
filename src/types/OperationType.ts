@@ -16,12 +16,12 @@ export type Operation = {
 
 export type OperationStatus = "Done" | "Decline"
 
-export interface OperationsProviderInterface {
+export interface OperationsProvider {
     operations: Operation[];
     source_url: string;
 }
 
-export interface OperationsSourceUrlProviderInterface {
+export interface OperationsProviderParams {
     figi?: string,
     start_date: string,
     end_date: string,

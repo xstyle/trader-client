@@ -1,11 +1,10 @@
-import { constants } from "buffer"
-import { useEffect, useState } from "react"
+import { ComponentType, FC, useEffect, useState } from "react"
 import useSWR from "swr"
-import { OperationsProviderInterface, OperationsSourceUrlProviderInterface, Operation } from "../../types/OperationType"
+import { Operation, OperationsProvider, OperationsProviderParams } from "../../types/OperationType"
 import { HOSTNAME } from "../../utils/env"
 
 
-export function operationsSourceUrlProvider({ figi, start_date, end_date, status }: OperationsSourceUrlProviderInterface) {
+export function operationsSourceUrlProvider({ figi, start_date, end_date, status }: OperationsProviderParams) {
     const url = new URL('/operation', `http://${HOSTNAME}:3001`)
 
     figi && url.searchParams.set('figi', figi)
@@ -17,7 +16,7 @@ export function operationsSourceUrlProvider({ figi, start_date, end_date, status
     return url.href
 }
 
-export function operationsProvider<TProps extends OperationsSourceUrlProviderInterface>(Component: React.ComponentType<TProps & OperationsProviderInterface>): React.FC<TProps> {
+export function operationsProvider<TProps extends {}>(Component: ComponentType<TProps & OperationsProvider>): FC<TProps & OperationsProviderParams> {
     return (props) => {
         const [cache, setCache] = useState<Operation[]>([]);
         const source_url = operationsSourceUrlProvider(props);

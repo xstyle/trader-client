@@ -2,7 +2,7 @@ import { OperationType, OperationTypeWithCommission } from "@tinkoff/invest-open
 import Head from "next/head"
 import Link from "next/link"
 import { useRouter } from "next/router"
-import React, { useState } from "react"
+import React, { ComponentType, FC, useState } from "react"
 import { Badge, Button, ButtonToolbar, Card, Container, Form, Table } from "react-bootstrap"
 import ReactDatePicker from "react-datepicker"
 import "react-datepicker/dist/react-datepicker.css"
@@ -10,9 +10,10 @@ import Moment from "react-moment"
 import { MarketInstrumentField } from "../components/Candle"
 import Header from "../components/Header"
 import { operationsProvider } from "../components/Operation/OperationProvider"
+import { MarketInstrumentPriceWithCurrency } from "../components/Price"
 import { MultiSelectButtonGroupView } from "../components/SelectGroupButton"
 import { TickerNavbar } from "../components/TickerNavbar"
-import { OperationsProviderInterface, OperationsSourceUrlProviderInterface, OperationStatus } from "../types/OperationType"
+import { Operation, OperationsProvider, OperationsProviderParams, OperationStatus } from "../types/OperationType"
 import { defaultGetServerSideProps } from "../utils"
 
 export const getServerSideProps = defaultGetServerSideProps
@@ -30,7 +31,13 @@ export default function Page() {
 function Body() {
     const { query } = useRouter()
     return <>
-        {query.figi ? <TickerNavbar figi={query.figi as string} activeKey="operations" /> : null}
+        {
+            query.figi ?
+                <TickerNavbar
+                    figi={query.figi as string}
+                    activeKey="operations" /> :
+                null
+        }
         <Container fluid>
             <h1>Operations</h1>
             <Layout figi={query.figi as string | undefined} />
@@ -38,7 +45,7 @@ function Body() {
     </>
 }
 
-const Layout = LayoutCtrl<{ figi: string | undefined }>(LayoutView)
+const Layout = operationsCtrl<{ figi: string | undefined }>(LayoutView)
 
 type DateRange = {
     start_date?: Date,
@@ -47,7 +54,7 @@ type DateRange = {
     types: OperationTypeWithCommission[]
 }
 
-interface LayoutCtrlInterface {
+interface OperationsCtrl {
     onDataRangeChange: (date: [Date, Date]) => void
     onSetStart(date: string): void
     onSetEnd(date: string): void
@@ -56,7 +63,7 @@ interface LayoutCtrlInterface {
     onClearStatus(): void
 }
 
-function LayoutCtrl<TProps extends {}>(Component: React.ComponentType<TProps & LayoutCtrlInterface & DateRange>): React.FC<TProps> {
+function operationsCtrl<TProps extends {}>(Component: ComponentType<TProps & OperationsCtrl & DateRange>): FC<TProps> {
     return (props) => {
         const [state, setState] = useState<DateRange>({
             status: ["Done"],
@@ -126,7 +133,7 @@ function LayoutCtrl<TProps extends {}>(Component: React.ComponentType<TProps & L
 const defaultStatuses: OperationStatus[] = ["Done", "Decline"]
 const defaultTypes: OperationTypeWithCommission[] = ["Sell", "Buy", "BuyCard", "MarginCommission", "BrokerCommission"]
 
-function LayoutView(props: LayoutCtrlInterface & DateRange) {
+function LayoutView(props: OperationsCtrl & DateRange) {
     return <>
         <Form.Group>
             <ReactDatePicker
@@ -144,23 +151,29 @@ function LayoutView(props: LayoutCtrlInterface & DateRange) {
                 options={defaultStatuses.map(status => ({ name: status, value: status }))}
                 values={props.status}
                 onSelect={props.onToogleStatus} />
-
-            <Button className="ml-3 mr-3 mb-3" size="sm" onClick={props.onClearStatus}>All</Button>
+            <Button
+                className="ml-3 mr-3 mb-3"
+                size="sm"
+                onClick={props.onClearStatus}>All</Button>
             <MultiSelectButtonGroupView
                 options={defaultTypes.map(type => ({ name: type, value: type }))}
                 values={props.types}
                 onSelect={props.onToogleOperationType} />
         </ButtonToolbar>
-        {props.start_date && props.end_date && <Operations
-            {...props}
-            start_date={props.start_date.toISOString()}
-            end_date={props.end_date.toISOString()} />}
+        {
+            props.start_date && props.end_date ?
+                <Operations
+                    {...props}
+                    start_date={props.start_date.toISOString()}
+                    end_date={props.end_date.toISOString()} /> :
+                null
+        }
     </>
 }
 
 const Operations = operationsProvider(OperationsView)
 
-function OperationsView(props: OperationsProviderInterface & OperationsSourceUrlProviderInterface & LayoutCtrlInterface) {
+function OperationsView(props: OperationsProvider & OperationsProviderParams & OperationsCtrl) {
     const { figi } = props
     return <>
         {
@@ -181,13 +194,15 @@ function OperationsView(props: OperationsProviderInterface & OperationsSourceUrl
                 </Form.Group> :
                 null
         }
-        <Card>
+        <Card className="mb-3">
             <OperationTableView {...props} />
         </Card>
+
+        <OperationsStatistics {...props} />
     </>
 }
 
-function OperationTableView({ operations, figi, onSetEnd, onSetStart }: OperationsProviderInterface & OperationsSourceUrlProviderInterface & LayoutCtrlInterface) {
+function OperationTableView({ operations, figi, onSetEnd, onSetStart }: OperationsProvider & OperationsCtrl & { figi?: string }) {
     const { query } = useRouter()
     return <Table
         hover
@@ -225,7 +240,11 @@ function OperationTableView({ operations, figi, onSetEnd, onSetStart }: Operatio
                                             figi: item.figi
                                         }
                                     }}>
-                                    <a><MarketInstrumentField figi={item.figi} fieldName="ticker" /></a>
+                                    <a>
+                                        <MarketInstrumentField
+                                            figi={item.figi}
+                                            fieldName="ticker" />
+                                    </a>
                                 </Link> :
                                     null
                             }
@@ -238,7 +257,9 @@ function OperationTableView({ operations, figi, onSetEnd, onSetStart }: Operatio
                                 titleFormat="DD/MM/YYYY  HH:mm:ss">{item.date}</Moment>
                         </td>
                         <td>
-                            <Button onClick={() => onSetStart(item.date)}>start</Button> <Button onClick={() => onSetEnd(item.date)}>end</Button>
+                            <Button
+                                onClick={() => onSetStart(item.date)}>start</Button> <Button
+                                    onClick={() => onSetEnd(item.date)}>end</Button>
                         </td>
                         <td>{item.quantity}</td>
                         <td><b>{item.quantityExecuted}</b></td>
@@ -280,5 +301,97 @@ function OperationTableView({ operations, figi, onSetEnd, onSetStart }: Operatio
                 <th></th>
             </tr>
         </tfoot>
+    </Table>
+}
+
+function OperationsStatistics(props: OperationsProvider) {
+    const operationsIndex = props.operations.reduce((result, operation) => {
+        const instrument = result[operation.figi] ?? (result[operation.figi] = { operations: [], figi: operation.figi })
+        instrument.operations.push(operation)
+        return result
+    }, {} as {
+        [id: string]: {
+            operations: Operation[]
+            figi: string
+        }
+    })
+
+    function getStatistic(instrumentOperation: { figi: string, operations: Operation[] }) {
+        const buyOperations = instrumentOperation.operations.filter(operation => operation.operationType === "Buy")
+        const sellOperations = instrumentOperation.operations.filter(operation => operation.operationType === "Sell")
+        const buy = buyOperations.reduce((result, operation) => operation.quantityExecuted + result, 0)
+        const sell = sellOperations.reduce((result, operation) => operation.quantityExecuted + result, 0)
+
+        const paymentBuy = buyOperations.reduce((result, operation) => operation.payment + result, 0)
+        const paymentSell = sellOperations.reduce((result, operation) => operation.payment + result, 0)
+
+        const balance = buy - sell
+        const paymentBalance = paymentBuy + paymentSell
+
+        return {
+            ...instrumentOperation,
+            statistics: {
+                buy,
+                sell,
+                balance,
+                paymentBuy,
+                paymentSell,
+                paymentBalance,
+                price: paymentBalance / balance
+            }
+        }
+    }
+    const instrumentsOperations = Object.values(operationsIndex)
+    const instrumentsOperationsWithStatistics = instrumentsOperations.map(getStatistic)
+
+    return <Table bordered hover striped>
+        <thead>
+            <tr>
+                <th>FIGI</th>
+                <th className="text-right">Sell</th>
+                <th className="text-right">Buy</th>
+                <th className="text-right">Balance</th>
+                <th className="text-right">Payment Sell</th>
+                <th className="text-right">Payment Buy</th>
+                <th className="text-right">Payment Balance</th>
+                <th className="text-right">Price</th>
+            </tr>
+        </thead>
+        <tbody>
+            {
+                instrumentsOperationsWithStatistics.map((instrumentsOperations) => (
+                    <tr>
+                        <td>
+                            <MarketInstrumentField
+                                figi={instrumentsOperations.figi}
+                                fieldName="ticker" />
+                        </td>
+                        <td className="text-monospace text-right">{instrumentsOperations.statistics.sell}</td>
+                        <td className="text-monospace text-right">{instrumentsOperations.statistics.buy}</td>
+                        <td className="text-monospace text-right">{instrumentsOperations.statistics.balance}</td>
+                        <td className="text-monospace text-right">
+                            <MarketInstrumentPriceWithCurrency
+                                figi={instrumentsOperations.figi}
+                                price={instrumentsOperations.statistics.paymentSell} />
+                        </td>
+                        <td className="text-monospace text-right">
+                            <MarketInstrumentPriceWithCurrency
+                                figi={instrumentsOperations.figi}
+                                price={instrumentsOperations.statistics.paymentBuy} />
+                        </td>
+                        <td className="text-monospace text-right">
+                            <MarketInstrumentPriceWithCurrency
+                                figi={instrumentsOperations.figi}
+                                price={instrumentsOperations.statistics.paymentBalance} />
+                        </td>
+                        <td className="text-monospace text-right">
+                            <MarketInstrumentPriceWithCurrency
+                                figi={instrumentsOperations.figi}
+                                price={instrumentsOperations.statistics.price} />
+                        </td>
+                    </tr>
+                ))
+            }
+        </tbody>
     </Table>
 }

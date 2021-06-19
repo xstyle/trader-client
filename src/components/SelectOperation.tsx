@@ -4,7 +4,7 @@ import { Button, ButtonGroup, Form, Modal, Table, ToggleButton } from "react-boo
 import ReactDatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import Moment from "react-moment";
-import { Operation, OperationsProviderInterface, OperationsSourceUrlProviderInterface } from "../types/OperationType";
+import { Operation, OperationsProvider, OperationsProviderParams } from "../types/OperationType";
 import { operationsProvider } from "./Operation/OperationProvider";
 
 export function SelectOperation({
@@ -95,7 +95,7 @@ export interface OperationsSelectorCtrlInterface {
     status: "all" | "done"
 }
 
-function OperationsSelectorCtrl<TProps extends OperationsSourceUrlProviderInterface & OperationsProviderInterface & { exclude: string[], onSelect(operation: Operation): Promise<void> }>(Component: React.ComponentType<TProps & OperationsSelectorCtrlInterface>): React.FC<TProps> {
+function OperationsSelectorCtrl<TProps extends OperationsProviderParams & OperationsProvider & { exclude: string[], onSelect(operation: Operation): Promise<void> }>(Component: React.ComponentType<TProps & OperationsSelectorCtrlInterface>): React.FC<TProps> {
     return (props) => {
         const formik = useFormik<{ filter: "all" | "unselected", status: "all" | "done" }>({
             initialValues: {
@@ -167,7 +167,7 @@ const statuses = [
     { value: "all", name: "All" },
     { value: "done", name: "Done" }
 ]
-function OperationSelectorView({ operations, onSelect, exclude, onChange, filter, status, amount }: OperationsSelectorCtrlInterface & OperationsProviderInterface & { exclude: string[], onSelect(operation: Operation): Promise<void> }) {
+function OperationSelectorView({ operations, onSelect, exclude, onChange, filter, status, amount }: OperationsSelectorCtrlInterface & OperationsProvider & { exclude: string[], onSelect(operation: Operation): Promise<void> }) {
     return <>
         <Form inline className="mb-2">
             <i className="fa fa-filter mr-4" />
