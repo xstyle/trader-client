@@ -203,7 +203,10 @@ function OperationsView(props: OperationsProvider & OperationsProviderParams & O
         <Card className="mb-3">
             <OperationTableView {...props} />
         </Card>
-        <OperationsStatisticsView {...props} />
+        <h2 className="mb-3 mt-5">Statistics</h2>
+        <Card>
+            <OperationsStatisticsView {...props} />
+        </Card>
     </>
 }
 
