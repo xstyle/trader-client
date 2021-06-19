@@ -81,11 +81,17 @@ function operationsCtrl<TProps extends {}>(Component: ComponentType<TProps & Ope
         }
 
         const handleSetStart = (date: string) => {
-
+            setState({
+                ...state,
+                start_date: new Date(date)
+            })
         }
 
         const handleSetEnd = (date: string) => {
-
+            setState({
+                ...state,
+                end_date: new Date(date)
+            })
         }
 
         function handleToogleStatus(status: OperationStatus) {
@@ -257,8 +263,14 @@ function OperationTableView({ operations, figi, onSetEnd, onSetStart }: Operatio
                         </td>
                         <td>
                             <Button
-                                onClick={() => onSetStart(item.date)}>start</Button> <Button
-                                    onClick={() => onSetEnd(item.date)}>end</Button>
+                                className="mr-1"
+                                variant="secondary"
+                                size="sm"
+                                onClick={() => onSetStart(item.date)}>Start</Button>
+                            <Button
+                                size="sm"
+                                variant="secondary"
+                                onClick={() => onSetEnd(item.date)}>End</Button>
                         </td>
                         <td>{item.quantity}</td>
                         <td><b>{item.quantityExecuted}</b></td>
