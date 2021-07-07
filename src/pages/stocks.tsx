@@ -8,6 +8,7 @@ import Header from "../components/Header"
 import { MarketInstrumentPrice } from "../components/Price"
 import { SelectList } from "../components/SelectList"
 import { stocksProdiver } from "../components/Stock/StockProvider"
+import { getTickerUrl } from "../lib/link"
 import { StocksProviderInterface } from "../types/StockType"
 import { defaultGetServerSideProps } from "../utils"
 import { HOSTNAME } from '../utils/env'
@@ -150,7 +151,7 @@ function StocksTableView({ instruments, onAddTo }: StocksProviderInterface & Sto
                                     onClick={() => onAddTo(instrument.figi)}>Lists</Button>
                             </td>
                             <th>
-                                <Link href={`/ticker/${instrument.ticker}`}>
+                                <Link href={getTickerUrl(instrument.figi)}>
                                     <a>{instrument.ticker}</a>
                                 </Link>
                             </th>

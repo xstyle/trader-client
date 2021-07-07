@@ -7,6 +7,7 @@ import Header from "../components/Header"
 import { MarketInstrumentPrice, MarketInstrumentPriceWithCurrency } from "../components/Price"
 import { MarketInstrumentField } from "../components/Candle"
 import { HOSTNAME } from "../utils/env"
+import { getTickerUrl } from "../lib/link"
 
 
 export const getServerSideProps = defaultGetServerSideProps
@@ -99,7 +100,7 @@ const OrdersView = (props: OrdersProviderInterface & OrdersCtrlInterface) => (
                     props.orders.map(order => (
                         <tr key={order.orderId}>
                             <td>
-                                <Link href={`/ticker/${order.figi}`}>
+                                <Link href={getTickerUrl(order.figi)}>
                                     <a><MarketInstrumentField figi={order.figi} fieldName={"ticker"} /></a>
                                 </Link>
                             </td>

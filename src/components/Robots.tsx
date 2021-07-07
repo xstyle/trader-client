@@ -4,6 +4,7 @@ import React, { CSSProperties } from "react"
 import { Button, Card, Col, Form, Row, Table } from "react-bootstrap"
 import Moment from "react-moment"
 import { mutate } from "swr"
+import { getTickerUrl } from "../lib/link"
 import { RobotProviderInterface, RobotsProviderInterface, RobotsSourceUrlProviderInterface, RobotType } from "../types/RobotType"
 import { HOSTNAME } from "../utils/env"
 import useSuperCandle, { MarketInstrumentField } from "./Candle"
@@ -67,7 +68,7 @@ function RobotsGroupView(props: RobotsProviderInterface & RobotsSourceUrlProvide
             className="pb-2 pt-2 mt-3 align-items-end">
             <Col>
                 <h2 className="mb-0 ">
-                    <Link href={`/ticker/${props.figi}`}>
+                    <Link href={getTickerUrl(props.figi)}>
                         <a className="text-body">
                             <MarketInstrumentField
                                 figi={props.figi}

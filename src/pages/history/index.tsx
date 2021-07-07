@@ -7,6 +7,7 @@ import { PageWithHeader } from "../../components/Header";
 import { historiesProvider, HistoriesProviderInterface } from "../../components/History/HistoryProvider";
 import { MarketInstrumentField } from "../../components/Candle";
 import { defaultGetServerSideProps } from "../../utils"
+import { getTickerUrl } from "../../lib/link";
 
 export const getServerSideProps = defaultGetServerSideProps
 
@@ -56,7 +57,7 @@ function HistoriesView({ histories }: HistoriesProviderInterface) {
                             </td>
                             <td>
                                 <Link
-                                    href={`/ticker/${history.figi}`}
+                                    href={getTickerUrl(history.figi)}
                                     passHref>
                                     <a>
                                         <MarketInstrumentField figi={history.figi} fieldName="ticker" />

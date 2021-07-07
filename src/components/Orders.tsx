@@ -10,6 +10,7 @@ import { Paginator } from "../utils/pagination"
 import Price, { MarketInstrumentPriceWithCurrency } from "./Price"
 import { SelectOperation } from "./SelectOperation"
 import { MarketInstrumentField } from "./Candle"
+import { getTickerUrl } from "../lib/link"
 
 const style: React.CSSProperties = {
     position: 'sticky',
@@ -46,7 +47,7 @@ export function OrdersView({ orders }: OrdersProviderInterface) {
                                 <Moment withTitle titleFormat={"HH:mm:ss"} fromNow>{order.createdAt}</Moment>
                             </td>
                             <td>
-                                <Link href={`/ticker/${order.figi}`}>
+                                <Link href={getTickerUrl(order.figi)}>
                                     <a><MarketInstrumentField figi={order.figi} fieldName="ticker" /></a>
                                 </Link>
                             </td>

@@ -1,5 +1,7 @@
+import Link from "next/link"
 import React from "react"
 import { Table } from "react-bootstrap"
+import { getTickerUrl } from "../../lib/link"
 import { OperationsProvider } from "../../types/OperationType"
 import { MarketInstrumentField } from "../Candle"
 import { MarketInstrumentPriceWithCurrency } from "../Price"
@@ -54,7 +56,7 @@ export default function OperationsStatisticsView(props: { operations: OperationF
     return <Table hover>
         <thead>
             <tr>
-                <th>FIGI</th>
+                <th>Ticker</th>
                 <th className="text-right">Sell</th>
                 <th className="text-right">Buy</th>
                 <th className="text-right">Balance</th>
@@ -69,9 +71,13 @@ export default function OperationsStatisticsView(props: { operations: OperationF
                 instrumentsOperationsWithStatistics.map((instrumentsOperations) => (
                     <tr key={instrumentsOperations.figi}>
                         <td>
-                            <MarketInstrumentField
-                                figi={instrumentsOperations.figi}
-                                fieldName="ticker" />
+                            <Link href={getTickerUrl(instrumentsOperations.figi)}>
+                                <a>
+                                    <MarketInstrumentField
+                                        figi={instrumentsOperations.figi}
+                                        fieldName="ticker" />
+                                </a>
+                            </Link>
                         </td>
                         <td className="text-monospace text-right">{instrumentsOperations.statistics.sell}</td>
                         <td className="text-monospace text-right">{instrumentsOperations.statistics.buy}</td>

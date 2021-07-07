@@ -200,12 +200,13 @@ function OperationsView(props: OperationsProvider & OperationsProviderParams & O
                 </Form.Group> :
                 null
         }
-        <Card className="mb-3">
-            <OperationTableView {...props} />
-        </Card>
-        <h2 className="mb-3 mt-5">Statistics</h2>
+        <h2 className="mb-3 mt-5">Summary</h2>
         <Card>
             <OperationsStatisticsView {...props} />
+        </Card>
+        <h2 className="mb-3 mt-5">Operations: {props.start_date} - {props.end_date}</h2>
+        <Card className="mb-3">
+            <OperationTableView {...props} />
         </Card>
     </>
 }

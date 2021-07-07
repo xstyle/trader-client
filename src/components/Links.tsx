@@ -1,8 +1,9 @@
 import Link from "next/link";
+import { getTickerUrl } from "../lib/link";
 import { useMarketInstrument } from "./Candle";
 
 export function LinkToTickerPage(props: { figi: string, children: React.ReactChild }) {
-    return <Link href={`/ticker/${props.figi}`}>
+    return <Link href={getTickerUrl(props.figi)}>
         {props.children}
     </Link>
 }
