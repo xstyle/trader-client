@@ -53,7 +53,9 @@ export default function OperationsStatisticsView(props: { operations: OperationF
     const instrumentsOperations = Object.values(operationsIndex)
     const instrumentsOperationsWithStatistics = instrumentsOperations.map(getStatistic)
 
-    return <Table hover>
+    return <Table 
+        responsive
+        hover>
         <thead>
             <tr>
                 <th>Ticker</th>

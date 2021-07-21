@@ -204,7 +204,9 @@ function OperationsView(props: OperationsProvider & OperationsProviderParams & O
         <Card>
             <OperationsStatisticsView {...props} />
         </Card>
-        <h2 className="mb-3 mt-5">Operations: {props.start_date} - {props.end_date}</h2>
+        <h2 className="mb-3 mt-5">
+            Operations: <Moment date={props.start_date} format="YYYY.MM.DD HH:mm:ss" /> - <Moment date={props.end_date} format="YYYY.MM.DD HH:mm:ss" />
+        </h2>
         <Card className="mb-3">
             <OperationTableView {...props} />
         </Card>
