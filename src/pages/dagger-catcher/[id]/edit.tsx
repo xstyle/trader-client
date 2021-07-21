@@ -1,11 +1,12 @@
 import { useFormik } from "formik"
 import Link from "next/link"
 import { useRouter } from "next/router"
-import { ChangeEvent, ChangeEventHandler, FormEvent, FormEventHandler, useEffect, useState } from "react"
+import React, { ChangeEvent, ChangeEventHandler, FormEvent, FormEventHandler, useEffect, useState } from "react"
 import { Breadcrumb, Button, Card, Container, Form } from "react-bootstrap"
 import { mutate } from "swr"
 import { daggerCatcherProvider } from "../../../components/DaggerCatcher/DaggerCatcherProvider"
 import Header from "../../../components/Header"
+import { SelectButtonGroupView } from "../../../components/SelectGroupButton"
 import { DaggerCatcherProviderInterface } from "../../../types/DaggerCatcherType"
 import { defaultGetServerSideProps } from "../../../utils"
 import { HOSTNAME } from "../../../utils/env"
@@ -95,6 +96,16 @@ function DaggerCatcherEditorView({ daggerCatcher, onChange, onSubmit, is_saving 
                         name="max"
                         onChange={onChange}
                         value={daggerCatcher.max} />
+                </Form.Group>
+                <Form.Group>
+                    <SelectButtonGroupView
+                        onSelect={
+                            (value) => onChange({
+                                target: { name: "is_hidden", checked: value ?? false, type: "checkbox" }
+                            } as React.ChangeEvent<HTMLInputElement>)
+                        }
+                        value={daggerCatcher.is_hidden}
+                        options={[{ name: "Hide", value: true }, { name: "Show", value: false }]} />
                 </Form.Group>
                 <Form.Group>
                     <Button

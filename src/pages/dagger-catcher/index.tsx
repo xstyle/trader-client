@@ -36,7 +36,7 @@ function Body() {
                 <Button variant="primary">Create</Button>
             </Link>
         </div>
-        <DaggerCatchers />
+        <DaggerCatchers isHidden={false}/>
     </Container>
 }
 

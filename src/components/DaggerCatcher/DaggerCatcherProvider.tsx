@@ -1,5 +1,6 @@
+import { ComponentType, FC } from "react"
 import useSWR from "swr"
-import { DaggerCatcherProviderInterface, DaggerCatcherSourceUrlProviderInterface, DaggerCatchersProviderInterface, DaggerCatcherType } from "../../types/DaggerCatcherType"
+import { DaggerCatcherProviderInterface, DaggerCatcherProviderParams, DaggerCatcherSourceUrlProviderInterface, DaggerCatchersProviderInterface, DaggerCatcherType } from "../../types/DaggerCatcherType"
 import { HOSTNAME } from "../../utils/env"
 
 export function daggerCatcherProvider<TProps extends DaggerCatcherSourceUrlProviderInterface>(Component: React.ComponentType<TProps & DaggerCatcherProviderInterface>): React.FC<TProps> {
@@ -21,9 +22,12 @@ export function daggerCatcherSourceUrlProvider({ id }: DaggerCatcherSourceUrlPro
     return `http://${HOSTNAME}:3001/dagger-catcher/${id}`
 }
 
-export function daggerCatchersProvider<TProps extends {}>(Component: React.ComponentType<TProps & DaggerCatchersProviderInterface>): React.FC<TProps> {
+export function daggerCatchersProvider<TProps extends {}>(Component: ComponentType<TProps & DaggerCatchersProviderInterface>): FC<TProps & DaggerCatcherProviderParams> {
     return (props) => {
-        const source_url = `http://${HOSTNAME}:3001/dagger-catcher`
+        const url = new URL('/dagger-catcher', `http://${HOSTNAME}:3001`)
+        if (typeof props.isHidden === "boolean") url.searchParams.set("is_hidden", props.isHidden.toString())
+
+        const source_url = url.href
         const { data, error } = useSWR<DaggerCatcherType[]>(source_url)
         if (error) return <div>Error</div>
         if (!data) return <div>Loading...</div>

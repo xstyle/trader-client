@@ -11,7 +11,7 @@ interface SelectButtonGroupViewProps<T = any> {
 }
 
 export function SelectButtonGroupView<T>(props: SelectButtonGroupViewProps<T>) {
-    return <ButtonGroup className="mb-3">
+    return <ButtonGroup>
         {
             props.options.map((option, index) => (
                 <Button

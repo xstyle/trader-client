@@ -1,12 +1,13 @@
 export type NewDaggerCatcherType = {
-    figi: string;
-    max: number;
-    min: number;
+    figi: string
+    max: number
+    min: number
 }
 
 export type DaggerCatcherType = NewDaggerCatcherType & {
-    _id: string;
-    is_pinned: boolean;
+    _id: string
+    is_pinned: boolean
+    is_hidden: boolean
 }
 
 export interface DaggerCatcherSourceUrlProviderInterface {
@@ -21,4 +22,8 @@ export interface DaggerCatcherProviderInterface {
 export interface DaggerCatchersProviderInterface {
     daggerCatchers: DaggerCatcherType[]
     source_url: string
+}
+
+export interface DaggerCatcherProviderParams {
+    isHidden?: boolean
 }
