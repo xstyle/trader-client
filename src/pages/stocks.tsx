@@ -15,25 +15,6 @@ import { HOSTNAME } from '../utils/env'
 
 export const getServerSideProps = defaultGetServerSideProps
 
-function Page() {
-    return <>
-        <Head>
-            <title>Stocks</title>
-        </Head>
-        <Header />
-        <Body />
-    </>
-}
-
-function Body() {
-    return <Container fluid>
-        <div className="d-flex flex-row justify-content-between align-items-center">
-            <h1>Stocks</h1>
-        </div>
-        <Stocks />
-    </Container>
-}
-
 interface StocksCtrlInterface {
     search: string
     onChange: ChangeEventHandler<HTMLInputElement>
@@ -41,80 +22,6 @@ interface StocksCtrlInterface {
     is_updating: boolean
 }
 
-function StocksCtrl<TProps extends {}>(Component: React.ComponentType<TProps & StocksCtrlInterface>): React.FC<TProps> {
-    return (props) => {
-        const [is_updating, setUpdating] = useState(false)
-        const { values: { search }, handleChange } = useFormik({
-            initialValues: { search: '' },
-            onSubmit: () => { }
-        })
-
-        async function handleUpdateDb() {
-            setUpdating(true)
-            await fetch(`http://${HOSTNAME}:3001/ticker/updatedb`)
-            // mutate(props.source_url)
-            setUpdating(false)
-        }
-        return <Component
-            {...props}
-            search={search}
-            onChange={handleChange}
-            onUpdateDb={handleUpdateDb}
-            is_updating={is_updating} />
-    }
-}
-
-function StocksView({ search, onChange, is_updating, onUpdateDb }: StocksCtrlInterface) {
-    return <>
-        <Form.Group>
-            <Form.Row>
-                <Col>
-                    <Form.Control
-                        placeholder="Type text to search stocks..."
-                        value={search}
-                        onChange={onChange} />
-                </Col>
-                <Col xs="auto">
-                    <Button
-                        variant="dark"
-                        disabled={is_updating}
-                        onClick={onUpdateDb}>{is_updating ? "Updating..." : "Update DB"}</Button>
-                </Col>
-            </Form.Row>
-        </Form.Group>
-
-        <StocksTable search={search} />
-    </>
-}
-
-const Stocks = StocksCtrl(StocksView)
-
-interface StocksTableCtrlInterface {
-    onAddTo(figi: string): void
-}
-
-function StocksTableCtrl<TProps extends {}>(Component: React.ComponentType<TProps & StocksTableCtrlInterface>): React.FC<TProps> {
-    return (props) => {
-        const [figi, setFigi] = useState('')
-        function handleAddTo(figi: string) {
-            setFigi(figi)
-        }
-
-        function handleClose() {
-            setFigi('')
-        }
-
-        return <>
-            <Component
-                {...props}
-                onAddTo={handleAddTo} />
-            <SelectList
-                figi={figi}
-                show={!!figi}
-                onClose={handleClose} />
-        </>
-    }
-}
 function StocksTableView({ instruments, onAddTo }: StocksProviderInterface & StocksTableCtrlInterface) {
     const offset = {
         top: -1000,
@@ -179,6 +86,100 @@ function StocksTableView({ instruments, onAddTo }: StocksProviderInterface & Sto
         </Table >
     </Card>
 }
+
+interface StocksTableCtrlInterface {
+    onAddTo(figi: string): void
+}
+
+function StocksTableCtrl<TProps extends {}>(Component: React.ComponentType<TProps & StocksTableCtrlInterface>): React.FC<TProps> {
+    return (props) => {
+        const [figi, setFigi] = useState('')
+        function handleAddTo(figi: string) {
+            setFigi(figi)
+        }
+
+        function handleClose() {
+            setFigi('')
+        }
+
+        return <>
+            <Component
+                {...props}
+                onAddTo={handleAddTo} />
+            <SelectList
+                figi={figi}
+                show={!!figi}
+                onClose={handleClose} />
+        </>
+    }
+}
+
 const StocksTable = stocksProdiver(StocksTableCtrl(StocksTableView))
 
-export default Page
+function StocksCtrl<TProps extends {}>(Component: React.ComponentType<TProps & StocksCtrlInterface>): React.FC<TProps> {
+    return (props) => {
+        const [is_updating, setUpdating] = useState(false)
+        const { values: { search }, handleChange } = useFormik({
+            initialValues: { search: '' },
+            onSubmit: () => { }
+        })
+
+        async function handleUpdateDb() {
+            setUpdating(true)
+            await fetch(`http://${HOSTNAME}:3001/ticker/updatedb`)
+            // mutate(props.source_url)
+            setUpdating(false)
+        }
+        return <Component
+            {...props}
+            search={search}
+            onChange={handleChange}
+            onUpdateDb={handleUpdateDb}
+            is_updating={is_updating} />
+    }
+}
+
+function StocksView({ search, onChange, is_updating, onUpdateDb }: StocksCtrlInterface) {
+    return <>
+        <Form.Group>
+            <Form.Row>
+                <Col>
+                    <Form.Control
+                        name="search"
+                        placeholder="Type text to search stocks..."
+                        value={search}
+                        onChange={onChange} />
+                </Col>
+                <Col xs="auto">
+                    <Button
+                        variant="dark"
+                        disabled={is_updating}
+                        onClick={onUpdateDb}>{is_updating ? "Updating..." : "Update DB of stocks"}</Button>
+                </Col>
+            </Form.Row>
+        </Form.Group>
+
+        <StocksTable search={search} />
+    </>
+}
+
+const Stocks = StocksCtrl(StocksView)
+
+function Body() {
+    return <Container fluid>
+        <div className="d-flex flex-row justify-content-between align-items-center">
+            <h1>Stocks</h1>
+        </div>
+        <Stocks />
+    </Container>
+}
+
+export default function Page() {
+    return <>
+        <Head>
+            <title>Stocks</title>
+        </Head>
+        <Header />
+        <Body />
+    </>
+}
