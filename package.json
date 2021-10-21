@@ -48,6 +48,7 @@
     "@types/react": "^17.0.9",
     "@types/react-datepicker": "^3.1.8",
     "@types/react-dom": "^17.0.6",
+    "@types/recharts": "^1.8.23",
     "del": "^6.0.0",
     "gulp": "^4.0.2",
     "gulp-rsync": "0.0.9",
