@@ -1,7 +1,7 @@
 import Head from "next/head"
 import Link from "next/link"
 import React, { useState } from "react"
-import { Button, Card, Container, ListGroup, Modal, ModalProps, Table } from "react-bootstrap"
+import { Button, Card, Container, ListGroup, Modal, ModalProps, Table, Image } from "react-bootstrap"
 import Moment from "react-moment"
 import { MarketInstrumentField, PriceChange, useMarketInstrument } from "../../components/Candle"
 import { withModal } from "../../components/ChartModal"
@@ -32,14 +32,25 @@ function Comments(props: CommentsProviderParams) {
                 comments.map((comment) =>
                     <ListGroup.Item>
                         <div className="mb-3">
-                            <h6 style={{fontWeight: "bold"}}>{comment.nickname}</h6>
+                            <h6 style={{ fontWeight: "bold" }}>{comment.nickname}</h6>
                             <small>
                                 <Moment date={comment.inserted} format="HH:mm D MMMM YY" /></small>
 
                         </div>
-                        <div style={{ whiteSpace: "pre-wrap" }}>
+                        <div
+                            style={{ whiteSpace: "pre-wrap" }}
+                            className="mb-3">
                             {comment.text}
                         </div>
+                        {
+                            comment.postImages.map((image) => 
+                                <Image 
+                                    rounded
+                                    className="mb-3"
+                                    fluid 
+                                    src={`https://www.tinkoff.ru/api/invest-gw/social/file/v1/cache/post/image/${image.id}?size=original&appName=invest&platform=web`} />
+                            )
+                        }
                     </ListGroup.Item>
                 )
             }
@@ -66,7 +77,9 @@ function CommentsModalButton(props: { figi: string }) {
                     Comments
                 </Modal.Title>
             </Modal.Header>
-            <Modal.Body>
+            
+            <Modal.Body className="p-0">
+
                 {instrument ? <Comments ticker={instrument.ticker} /> : null}
             </Modal.Body>
         </Modal>

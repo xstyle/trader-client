@@ -28,7 +28,11 @@ export type Comment = {
     "profileId": string,
     "nickname": string,
     "image": null,
-    "postImages": [],
+    "postImages": {
+        id: string,
+        height: number,
+        width: number
+    }[],
     "hashtags": [],
     "owner": {
         "id": string,
