@@ -3,29 +3,90 @@ import Link from "next/link"
 import { useRouter } from "next/router"
 import React from "react"
 import { Breadcrumb, Button, Card, Col, Container, Nav, Row, Table } from "react-bootstrap"
+import { MarketInstrumentField, PreviousDayPrice, PriceChange } from "../../components/Candle"
 import Header from "../../components/Header"
 import { LinkToTickerPage } from "../../components/Links"
 import { listProvider, listsProvider } from "../../components/List/ListProvider"
 import { MarketInstrumentPrice } from "../../components/Price"
-import { MarketInstrumentField } from "../../components/Candle"
 import { ListProviderInterface, ListSourceUrlProviderInterface, ListsProviderInterface } from "../../types/ListType"
 import { defaultGetServerSideProps } from "../../utils"
 
 export const getServerSideProps = defaultGetServerSideProps
 
-export default function Page() {
+function ListsNavView({ lists, id }: ListsProviderInterface & { id: string }) {
+    return <Nav
+        variant="pills"
+        style={{ position: 'sticky', top: '1rem' }}
+        className="flex-column">
+        {
+            lists.map(list =>
+                <Link
+                    key={list._id}
+                    href={`/list/${list._id}`}
+                    passHref>
+                    <Nav.Link
+                        active={list._id === id}
+                        className="d-flex flex-row justify-content-between">
+                        {list.name}
+                    </Nav.Link>
+                </Link>
+            )
+        }
+    </Nav>
+}
+
+const ListsNav = listsProvider(ListsNavView)
+
+function ListView({ list }: ListProviderInterface & ListSourceUrlProviderInterface) {
     return <>
-        <Head>
-            <title>List</title>
-        </Head>
-        <Header />
-        <Body />
+        <Card className="mb-2">
+            <Card.Header>{list.name}</Card.Header>
+            <Table hover>
+                <thead>
+                    <tr>
+                        <th>Ticker</th>
+                        <th className="text-right">Price</th>
+                        <th className="text-right">Historical Price</th>
+                        <th className="text-right">Change</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {
+                        list.figis.map((figi) =>
+                            <tr key={figi}>
+                                <th>
+                                    <LinkToTickerPage figi={figi}>
+                                        <a>
+                                            <MarketInstrumentField
+                                                figi={figi}
+                                                fieldName="ticker" />
+                                        </a>
+                                    </LinkToTickerPage>
+                                </th>
+                                <td className="text-right text-nowrap">
+                                    <MarketInstrumentPrice figi={figi} />
+                                </td>
+                                <td className="text-right">
+                                    <PreviousDayPrice figi={figi} days_shift={-1} />
+                                </td>
+                                <td className="text-right">
+                                    <PriceChange figi={figi} days_shift={-1} />
+                                </td>
+                            </tr>
+                        )
+                    }
+                </tbody>
+            </Table>
+        </Card>
     </>
 }
 
+const List = listProvider(ListView)
+
 function Body() {
     const { query: { id } } = useRouter()
-    if (!id) return null
+    if (typeof id !== "string") return null
+
     return <Container fluid>
         <Row>
             <Col xl={2} lg={3} md={4} className="d-none d-md-block">
@@ -51,67 +112,15 @@ function Body() {
                 <List id={id as string} />
             </Col>
         </Row>
-
     </Container>
 }
 
-const ListsNav = listsProvider(ListsNavView)
-const List = listProvider(ListView)
-
-function ListsNavView({ lists, id }: ListsProviderInterface & { id: string }) {
-    return <Nav
-        variant="pills"
-        style={{ position: 'sticky', top: '1rem' }}
-        className="flex-column">
-        {
-            lists.map(list =>
-                <Link
-                    key={list._id}
-                    href={`/list/${list._id}`}
-                    passHref>
-                    <Nav.Link
-                        active={list._id === id}
-                        className="d-flex flex-row justify-content-between">
-                        {list.name}
-                    </Nav.Link>
-                </Link>
-            )
-        }
-    </Nav>
-}
-
-function ListView({ list }: ListProviderInterface & ListSourceUrlProviderInterface) {
+export default function Page() {
     return <>
-        <Card className="mb-2">
-            <Card.Header>{list.name}</Card.Header>
-            <Table hover>
-                <thead>
-                    <tr>
-                        <th>Ticker</th>
-                        <th className="text-right">Price</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {
-                        list.figis.map((figi) =>
-                            <tr key={figi}>
-                                <th>
-                                    <LinkToTickerPage figi={figi}>
-                                        <a>
-                                            <MarketInstrumentField
-                                                figi={figi}
-                                                fieldName="ticker" />
-                                        </a>
-                                    </LinkToTickerPage>
-                                </th>
-                                <td className="text-right text-nowrap">
-                                    <MarketInstrumentPrice figi={figi} />
-                                </td>
-                            </tr>
-                        )
-                    }
-                </tbody>
-            </Table>
-        </Card>
+        <Head>
+            <title>List</title>
+        </Head>
+        <Header />
+        <Body />
     </>
 }
